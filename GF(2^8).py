@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
+# Section 3.2: "bytes are interpreted as finite field elements using a [degree-7] polynomial representation" (The finite field being GF(2^8), IE Galois finite field with 2**8=256 elements)
 class Polynomial: # Represents specifically a polynomial in GF(2^8)
     def __init__(self, coefficients=[0] * 8):
+        # coefficients[i] should be the coefficient of the term with degree i
+        # (EG, coefficients[0] should be the constant)
         if (len(coefficients)) != 8:
             raise ValueError("A polynomial in GF(2^8) has 8 coefficients.  Actual coefficient list: " + str(coefficients) + "; len: " + str(len(coefficients)))
         for i in coefficients:
@@ -11,21 +14,23 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         self.coefficients = coefficients
         
     def __add__(self, other):
-        # Straightforward element-wise XOR
+        # Section 4.1: "The addition of two elements in a finite field is achieved by 'adding' the coefficients for the corresponding powers in the polynomials for the two elements. The addition is performed with the XOR operation"
         new_coeff = [-1] * 8
         for i in range(8):
             new_coeff[i] = self.coefficients[i] ^ other.coefficients[i]
         return Polynomial(new_coeff)
     
     def __sub(self, other):
-        return self + other # In GF(2^8), addition and subtraction are the same
+        # Section 4.1: "subtraction of polynomials is identical to addition of polynomials."
+        return self + other
     
     def __mul__(self, other):
-        # Sadly we cannot convert the coefficient arrays to Integers and multiply,
-        # because python Integer multiplication doesn't quite behave the same way as
-        # GF(2^8) polynomial multiplication.
+        # "multiplication in GF(2^8) (denoted by •) corresponds with the multiplication of polynomials modulo an irreducible polynomial of degree 8."
+        # Sadly, python Integer multiplication doesn't quite behave the same way as GF(2^8) polynomial multiplication.
         # EG: (x + 1)(x + 1) = x^2 + x + x + 1 = x^2 + 1 
-        # But x+1 converts to 3, x^2+1 converts to 5, and 3*3 is not 5
+        # But x + 1 = 1x^1 + 1x^0 corresponds to 3, x^2 + 1 = 1x^2 + 0x^1 + 1x^2 corresponds to 5, but 3*3 is not 5
+        # Therefore, this implementation cannot something simple such as converting the coefficient arrays to Integers and multiplying.
+        # (Section 4.2.1 describes a special-case implementation of multiplication by x^1, which is not implemented here for pedagogical reasons.)
         product = [0] * 15 # product of degree-7 polynomials is at most degree 14 (so 14+1 coefficients)
         for i in range(len(self.coefficients)): # Index into self.coefficients
             for j in range(len(other.coefficients)): # Index into other.coefficients
@@ -36,12 +41,13 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         # The algorithm is polynomial long division, discarding the quotient
         while degree(product) > 8:
             factorDegree = degree(product) - degree(m())
-            factor = ([0] * factorDegree) + m() # concatenate coefficient arrays
+            factor = ([0] * factorDegree) + m() # m() is a coefficient array
             for i in range(len(factor)):
                 product[i] ^= factor[i] 
         return Polynomial(product[:8]) # Drop all but the first 8 coefficients     
     
     def __str__(self):
+        # Convienent string representation not described in the specification
         output = []
         for i in range(7, 1, -1): # 7, 6, 5, 4, 3, 2
             if self.coefficients[i]:
@@ -56,13 +62,16 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
             return "0"
 
 def m():
+    # Returns the coefficient array for the irreducible polynomial m used for multiplication
     return [1,1,0,1,1,0,0,0,1] # 1 + x + x^3 + x^4 + x^8
        
 def degree(coefficients):
+    # I can't find a simple way to find the index of last nonzero element of a list,
+    # especially if the list may be all zeros
     for i in range(len(coefficients) - 1, 0, -1):
         if coefficients[i]:
             return i
-    return 0 #1 has degree 0.  0 also has degree 0.
+    return 0 #0 has degree 0.
 
 x = Polynomial([1,1,1,0,1,0,1,0])
 y = Polynomial([1,1,0,0,0,0,0,1])
