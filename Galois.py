@@ -62,27 +62,22 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         return quotient
     
     def inverse(self):
+        raise NotImplementedError
         # EEA based off of wikipedia pseudocode
-        old_s = one()
-        s = zero()
-        old_t = one()
-        t = zero()
-        old_r = self
-        r = 
-        function extended_gcd(a, b)
-    s := 0;    old_s := 1
-    t := 1;    old_t := 0
-    r := b;    old_r := a
-    
-    while r ≠ 0
-        quotient := old_r div r
-        (old_r, r) := (r, old_r - quotient * r)
-        (old_s, s) := (s, old_s - quotient * s)
-        (old_t, t) := (t, old_t - quotient * t)
-    
-    output "Bézout coefficients:", (old_s, old_t)
-    output "greatest common divisor:", old_r
-    output "quotients by the gcd:", (t, s)
+#        old_s = one()
+#        s = zero()
+#        old_t = zero()
+#        t = one()
+#        old_r = mPoly()
+#        r = self
+#        while any(r):
+#            quotient = old_r / r
+#            (old_r, r) = (r, old_r - quotient * r)
+#            (old_s, s) = (s, old_s - quotient * s)
+#            (old_t, t) = (t, old_t - quotient * t)
+#        print("Bézout coefficients:", old_s, old_t, sep='')
+#        print("greatest common divisor:", old_r)
+#        print("quotients by the gcd:", t, s, sep='')
                 
             
             
@@ -101,6 +96,27 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
             return " + ".join(output)
         else:
             return "0"
+        
+class mPoly:
+    def __init__(self):
+        raise NotImplementedError
+        self.coefficients = m()
+#        
+#    def __truediv__(self, other):
+#        # Polynomial long division
+#        if not any(other.coefficients):
+#            raise ZeroDivisionError # No coefficient of other is nonzero means other is zero
+#        quotient = Polynomial()
+#        remainder = Polynomial(self.coefficients)
+#        degreeDifference = degree(remainder.coefficients) - degree(other.coefficients)
+#        while degreeDifference >= 0 and any(remainder.coefficients):
+#            leftShift = ([0] * degreeDifference) + other.coefficients
+#            factor = Polynomial(leftShift[:8])
+#            remainder -= factor
+#            quotient.coefficients[degreeDifference] = 1
+#            degreeDifference = degree(remainder.coefficients) - degree(other.coefficients)
+#        return quotient
+
 
 def one():
     return Polynomial([1,0,0,0,0,0,0])
