@@ -37,11 +37,17 @@ y = Polynomial([1,1,0,0,0,0,0,1])
 added = Polynomial([0,0,1,0,1,0,1,1])
 multiplied = Polynomial([1,0,0,0,0,0,1,1])
 
+print("Testing add...")
 testAdd(x,y,added) # Add is simple
+print("Done.")
+
+print("Testing multiplication...")
 testMult(x,y,multiplied) # Multiplication is complex, but there is a complicated test case
+print("Done.")
 
 # Let's do a lot of testing of division
 
+print("Testing division...")
 deg7 = Polynomial([0,0,0,0,0,0,0,1])
 deg0 = Polynomial([1,0,0,0,0,0,0,0])
 deg2 = Polynomial([1,0,1,0,0,0,0,0]) #x^2 + 1
@@ -54,5 +60,4 @@ testDiv(x, deg0, x)
 testDiv(y, deg0, y)
 testDiv(x,y,zero) 
 testDiv(y,deg1,Polynomial([0,1,1,1,1,1,1,0]))
-
-print("done")
+print("Done.")
