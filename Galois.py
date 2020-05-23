@@ -2,7 +2,7 @@
 
 
 
-
+import GeneralizedPoly # Used for the implementation of inverse
 
 # Section 3.2: "bytes are interpreted as finite field elements using a [degree-7] polynomial representation" (The finite field being GF(2^8), IE Galois finite field with 2**8=256 elements)
 
@@ -44,8 +44,8 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         # Now that we have the product, possibly of degree 8 or more, modulo it with m = x^8 + x^4 + x^3 + x + 1
         # The algorithm is polynomial long division, discarding the quotient
         
-        while degree(product) > 8:
-            factorDegree = degree(product) - degree(m())
+        while lsDegree(product) > 8:
+            factorDegree = lsDegree(product) - lsDegree(m())
             factor = ([0] * factorDegree) + m() # m() is a coefficient array
             for i in range(len(factor)):
                 product[i] ^= factor[i] 
@@ -58,13 +58,13 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
             raise ZeroDivisionError # No coefficient of other is nonzero means other is zero
         quotient = Polynomial()
         remainder = Polynomial(self.coefficients)
-        degreeDifference = degree(remainder.coefficients) - degree(other.coefficients)
+        degreeDifference = lsDegree(remainder.coefficients) - lsDegree(other.coefficients)
         while degreeDifference >= 0 and any(remainder.coefficients):
             leftShift = ([0] * degreeDifference) + other.coefficients
             factor = Polynomial(leftShift[:8])
             remainder -= factor
             quotient.coefficients[degreeDifference] = 1
-            degreeDifference = degree(remainder.coefficients) - degree(other.coefficients)
+            degreeDifference = lsDegree(remainder.coefficients) - lsDegree(other.coefficients)
         return quotient
     
     def __str__(self):
@@ -82,11 +82,61 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         else:
             return "0"
 
+
+    def inverse(self):
+        # EEA based off of wikipedia pseudocode
+        old_s = GeneralizedPoly.GenPoly([1]) # IE, old_s = 1
+        s = GeneralizedPoly.GenPoly([0]) #IE, s = 0
+        old_t = GeneralizedPoly.GenPoly([0]) #IE, old_t = 0
+        t = GeneralizedPoly.GenPoly([1]) # IE, t = 1
+        old_r = GeneralizedPoly.GenPoly(m()) # m() returns a list of coefficients!
+        r = GeneralizedPoly.GenPoly(self.coefficients)
+        while any(r.coefficients):
+            quotient = old_r / r
+            (old_r, r) = (r, old_r - quotient * r)
+            (old_s, s) = (s, old_s - quotient * s)
+            (old_t, t) = (t, old_t - quotient * t)
+
+        # At this point:
+        # self * old_t = m() * old_s
+        # So by section 4.2, the inverse of self is old_t % m()
+       
+        return modulo_m(old_t)
+
+        # Just in case...
+        #print("Bézout coefficients:", old_s, old_t, sep=',')
+        #print("greatest common divisor:", old_r)
+        #print("quotients by the gcd:", t, s, sep=',')
+
+    def degree(self):
+        return lsDegree(self.coefficients)
+
+    def copy(self):
+        return Polynomial(self.coefficients)
+
 def m():
     # Returns the coefficient array for the irreducible polynomial m used for multiplication
     return [1,1,0,1,1,0,0,0,1] # 1 + x + x^3 + x^4 + x^8
 
-def degree(coefficients):
+def mDegree():
+    return 8
+
+def mPoly():
+    return GeneralizedPoly.GenPoly(m())
+
+def modulo_m(poly):
+    modulus = GeneralizedPoly.GenPoly(poly.coefficients)
+    while modulus.degree() > 8:
+        factorDegree = modulus.degree() - mDegree()
+        factor = GeneralizedPoly.xToThe(factorDegree) * mPoly()
+        modulus -= factor
+    
+    output = Polynomial()
+    for i in range(len(modulus.coefficients)):
+        output.coefficients[i] = modulus.coefficients[i]
+    return output
+
+def lsDegree(coefficients):
     # I can't find a simple way to find the index of last nonzero element of a list,
     # especially if the list may be all zeros
     for i in range(len(coefficients) - 1, 0, -1):

@@ -1,5 +1,7 @@
 class GenPoly: # Represents a generalized polynomial with coefficients of 0 or 1
     def __init__(self, coefficients=[0] * 8):
+        if len(coefficients) == 0:
+            raise ValueError("Empty coefficient array")
         # coefficients[i] should be the coefficient of the term with degree i
         # (EG, coefficients[0] should be the constant)
         for i in coefficients:
@@ -59,38 +61,17 @@ class GenPoly: # Represents a generalized polynomial with coefficients of 0 or 1
             degreeDifference = remainder.degree() - other.degree()
         quotient.trim()
         return quotient
-    
-    def inverse(self):
-        raise NotImplementedError
-        # EEA based off of wikipedia pseudocode
-        old_s = one()
-        s = zero()
-        old_t = zero()
-        t = one()
-        old_r = mPoly()
-        r = self
-        while any(r.coefficients):
-            quotient = old_r / r
-            (old_r, r) = (r, old_r - quotient * r)
-            (old_s, s) = (s, old_s - quotient * s)
-            (old_t, t) = (t, old_t - quotient * t)
-        print("Bézout coefficients:", old_s, old_t, sep='')
-        print("greatest common divisor:", old_r)
-        print("quotients by the gcd:", t, s, sep='')
 
     def trim(self):
         self.coefficients = self.coefficients[:self.degree() + 1]
-                
-            
-            
     
     def __str__(self):
         # Convienent string representation not described in the specification
         output = []
-        for i in range(len(self) - 1, 1, -1): # 7, 6, 5, 4, 3, 2
+        for i in range(len(self) - 1, 1, -1): # From top to bottom, except for the x^1 & x^0 terms
             if self.coefficients[i]:
                 output.append("x^" + str(i))
-        if self.coefficients[1]:
+        if len(self.coefficients) >= 2 and self.coefficients[1]:
             output.append("x") # Not x^1
         if self.coefficients[0]:
             output.append("1") # Certainly not x^0
@@ -99,16 +80,12 @@ class GenPoly: # Represents a generalized polynomial with coefficients of 0 or 1
         else:
             return "0"
 
+    def copy(self):
+        return GenPoly(self.coefficients)
+
 def xToThe(n):
     leftPad = [0] * n;
     return GenPoly(leftPad + [1])
-
-def one():
-    return Polynomial([1,0,0,0,0,0,0,0])
-
-def zero():
-    return Polynomial([0,0,0,0,0,0,0,0])
-
        
 def lsDegree(coefficients):
     # I can't find a simple way to find the index of last nonzero element of a list,

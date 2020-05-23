@@ -61,3 +61,20 @@ testDiv(y, deg0, y)
 testDiv(x,y,zero) 
 testDiv(y,deg1,Polynomial([0,1,1,1,1,1,1,0]))
 print("Done.")
+
+print("Testing inverse...")
+
+def testInverse(x, expected):
+    actual = x.inverse()
+    if not (actual.coefficients == expected.coefficients):
+        print("inverse failed")
+        print("x: ", x, sep='')
+        print("actual: ", actual, sep='')
+        print("expected: ", expected, sep='')
+       
+x = Polynomial([0,1,0,0,0,0,0,0])
+xInverse = Polynomial([1, 0, 1, 1, 0, 0, 0, 1])
+testInverse(x, xInverse)
+testInverse(xInverse, x)
+testMult(x, xInverse, Polynomial([1,0,0,0,0,0,0,0]))
+print("Done")
