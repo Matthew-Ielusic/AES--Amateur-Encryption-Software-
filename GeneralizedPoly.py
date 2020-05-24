@@ -1,13 +1,16 @@
-class GenPoly: # Represents a generalized polynomial with coefficients of 0 or 1
-    def __init__(self, coefficients=[0] * 8):
+# GenPoly tepresents a generalized polynomial (IE, of arbitrary degree) with coefficients of 0 or 1
+class GenPoly: 
+    def __init__(self, coefficients):
         if len(coefficients) == 0:
             raise ValueError("Empty coefficient array")
         # coefficients[i] should be the coefficient of the term with degree i
         # (EG, coefficients[0] should be the constant)
+
+        # Error checking
         for i in coefficients:
             if not i in [0,1]:
-                raise ValueError("A polynomial in GF(2^8) has coefficients of zero or one.  Actual coefficient list: " + str(coefficients))
-        self.coefficients = coefficients[:]
+                raise ValueError("GenPoly can have coefficients of 0 or 1.  Actual coefficient list: " + str(coefficients))
+        self.coefficients = coefficients
 
     def degree(self):
         return lsDegree(self.coefficients)

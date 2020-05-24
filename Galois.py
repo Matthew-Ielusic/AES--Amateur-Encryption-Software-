@@ -2,12 +2,12 @@
 
 
 
-import GeneralizedPoly # Used for the implementation of inverse
-
+from GeneralizedPoly import GenPoly
+import GeneralizedPoly
 # Section 3.2: "bytes are interpreted as finite field elements using a [degree-7] polynomial representation" (The finite field being GF(2^8), IE Galois finite field with 2**8=256 elements)
 
-class Polynomial: # Represents specifically a polynomial in GF(2^8)
-    def __init__(self, coefficients=[0] * 8):
+class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
+    def __init__(self, coefficients):
         # coefficients[i] should be the coefficient of the term with degree i
         # (EG, coefficients[0] should be the constant)
         if (len(coefficients)) != 8:
@@ -15,14 +15,14 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         for i in coefficients:
             if not i in [0,1]:
                 raise ValueError("A polynomial in GF(2^8) has coefficients of zero or one.  Actual coefficient list: " + str(coefficients))
-        self.coefficients = coefficients[:]
+        self.coefficients = coefficients
 
     def __add__(self, other):
         # Section 4.1: "The addition of two elements in a finite field is achieved by 'adding' the coefficients for the corresponding powers in the polynomials for the two elements. The addition is performed with the XOR operation"
         new_coeff = [-1] * 8
         for i in range(8):
             new_coeff[i] = self.coefficients[i] ^ other.coefficients[i]
-        return Polynomial(new_coeff)
+        return BytePolynomial(new_coeff)
 
     def __sub__(self, other):
         # Section 4.1: "subtraction of polynomials is identical to addition of polynomials."
@@ -30,42 +30,16 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
 
     def __mul__(self, other):
         # "multiplication in GF(2^8) (denoted by •) corresponds with the multiplication of polynomials modulo an irreducible polynomial of degree 8."
-        # Sadly, python Integer multiplication doesn't quite behave the same way as GF(2^8) polynomial multiplication.
-        # EG: (x + 1)(x + 1) = x^2 + x + x + 1 = x^2 + 1 
-        # But x + 1 = 1x^1 + 1x^0 corresponds to 3, x^2 + 1 = 1x^2 + 0x^1 + 1x^2 corresponds to 5, but 3*3 is not 5
-        # Therefore, this implementation cannot something simple such as converting the coefficient arrays to Integers and multiplying.
-        # (Section 4.2.1 describes a special-case implementation of multiplication by x^1, which is not implemented here for pedagogical reasons.)
-        product = [0] * 15 # product of degree-7 polynomials is at most degree 14 (so 14+1 coefficients)
-        for i in range(len(self.coefficients)): # Index into self.coefficients
-            for j in range(len(other.coefficients)): # Index into other.coefficients
-                term = self.coefficients[i] * other.coefficients[j]
-                index = i + j
-                product[index] ^= term # "add" (xor) terms of the same degree
-        # Now that we have the product, possibly of degree 8 or more, modulo it with m = x^8 + x^4 + x^3 + x + 1
-        # The algorithm is polynomial long division, discarding the quotient
-        
-        while lsDegree(product) >= 8:
-            factorDegree = lsDegree(product) - lsDegree(m())
-            factor = ([0] * factorDegree) + m() # m() is a coefficient array
-            for i in range(len(factor)):
-                product[i] ^= factor[i] 
+        product = self.asGenPoly() * other.asGenPoly()
+        # Defer implementation of multiplation to that in GenPoly
 
-        return Polynomial(product[:8]) # Drop all but the first 8 coefficients  
+        # But then return the product modulo m = 1 + x + x^3 + x^4 + x^8
+        return modulo_m(product)
     
     def __truediv__(self, other):
         # Polynomial long division
-        if not any(other.coefficients):
-            raise ZeroDivisionError # No coefficient of other is nonzero means other is zero
-        quotient = Polynomial()
-        remainder = Polynomial(self.coefficients)
-        degreeDifference = lsDegree(remainder.coefficients) - lsDegree(other.coefficients)
-        while degreeDifference >= 0 and any(remainder.coefficients):
-            leftShift = ([0] * degreeDifference) + other.coefficients
-            factor = Polynomial(leftShift[:8])
-            remainder -= factor
-            quotient.coefficients[degreeDifference] = 1
-            degreeDifference = lsDegree(remainder.coefficients) - lsDegree(other.coefficients)
-        return quotient
+        quotient = self.asGenPoly() / other.asGenPoly()
+        return toBytePolynomial(quotient)
     
     def __str__(self):
         # Convienent string representation not described in the specification
@@ -85,12 +59,12 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
 
     def inverse(self):
         # EEA based off of wikipedia pseudocode
-        old_s = GeneralizedPoly.GenPoly([1]) # IE, old_s = 1
-        s = GeneralizedPoly.GenPoly([0]) #IE, s = 0
-        old_t = GeneralizedPoly.GenPoly([0]) #IE, old_t = 0
-        t = GeneralizedPoly.GenPoly([1]) # IE, t = 1
-        old_r = GeneralizedPoly.GenPoly(m()) # m() returns a list of coefficients!
-        r = GeneralizedPoly.GenPoly(self.coefficients)
+        old_s = GenPoly([1]) # IE, old_s = 1
+        s = GenPoly([0]) #IE, s = 0
+        old_t = GenPoly([0]) #IE, old_t = 0
+        t = GenPoly([1]) # IE, t = 1
+        old_r = m()
+        r = GenPoly(self.coefficients)
         while any(r.coefficients):
             quotient = old_r / r
             (old_r, r) = (r, old_r - quotient * r)
@@ -112,31 +86,43 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         return lsDegree(self.coefficients)
 
     def copy(self):
-        return Polynomial(self.coefficients)
+        return BytePolynomial(self.coefficients[:])
 
-def m():
+    def asGenPoly(self):
+        return GenPoly(self.coefficients[:])
+
+def zeroByte():
+    return BytePolynomial([0] * 8)
+
+def mCoefficients():
     # Returns the coefficient array for the irreducible polynomial m used for multiplication
     return [1,1,0,1,1,0,0,0,1] # 1 + x + x^3 + x^4 + x^8
 
 def mDegree():
     return 8
 
-def mPoly():
-    return GeneralizedPoly.GenPoly(m())
+def m():
+    return GenPoly(mCoefficients())
+
+def toBytePolynomial(genPoly):
+    if len(genPoly.coefficients) > 8:
+        return BytePolynomial(genPoly.coefficients[:8])
+    else:
+        coeff = genPoly.coefficients + ([0] * (8 - len(genPoly.coefficients)))
+        return BytePolynomial(coeff)
 
 def modulo_m(poly):
     # Polynomial long division by m, but return the remainder
-    remainder = GeneralizedPoly.GenPoly(poly.coefficients)
-    divisor = mPoly()
+    remainder = GenPoly(poly.coefficients)
+    divisor = m()
     degreeDifference = remainder.degree() - mDegree()
     while degreeDifference >= 0 and any(remainder.coefficients):
         factor = GeneralizedPoly.xToThe(degreeDifference)
         remainder -= (factor * divisor)
-        degreeDifference = remainder.degree() - mDegree.degree()
+        degreeDifference = remainder.degree() - mDegree()
     # Repeated calls to trim() in GenPoly.__sub__ mean len(remainder.coefficients) <= 8
     # But now we need to pad it to be 8 ints long
-    coeff = remainder.coefficients + ([0] * (8 - len(remainder.coefficients)))
-    return Polynomial(coeff)
+    return toBytePolynomial(remainder)
 
 def lsDegree(coefficients):
     # I can't find a simple way to find the index of last nonzero element of a list,
