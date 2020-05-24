@@ -44,7 +44,7 @@ class Polynomial: # Represents specifically a polynomial in GF(2^8)
         # Now that we have the product, possibly of degree 8 or more, modulo it with m = x^8 + x^4 + x^3 + x + 1
         # The algorithm is polynomial long division, discarding the quotient
         
-        while lsDegree(product) > 8:
+        while lsDegree(product) >= 8:
             factorDegree = lsDegree(product) - lsDegree(m())
             factor = ([0] * factorDegree) + m() # m() is a coefficient array
             for i in range(len(factor)):
@@ -125,16 +125,18 @@ def mPoly():
     return GeneralizedPoly.GenPoly(m())
 
 def modulo_m(poly):
-    modulus = GeneralizedPoly.GenPoly(poly.coefficients)
-    while modulus.degree() > 8:
-        factorDegree = modulus.degree() - mDegree()
-        factor = GeneralizedPoly.xToThe(factorDegree) * mPoly()
-        modulus -= factor
-    
-    output = Polynomial()
-    for i in range(len(modulus.coefficients)):
-        output.coefficients[i] = modulus.coefficients[i]
-    return output
+    # Polynomial long division by m, but return the remainder
+    remainder = GeneralizedPoly.GenPoly(poly.coefficients)
+    divisor = mPoly()
+    degreeDifference = remainder.degree() - mDegree()
+    while degreeDifference >= 0 and any(remainder.coefficients):
+        factor = GeneralizedPoly.xToThe(degreeDifference)
+        remainder -= (factor * divisor)
+        degreeDifference = remainder.degree() - mDegree.degree()
+    # Repeated calls to trim() in GenPoly.__sub__ mean len(remainder.coefficients) <= 8
+    # But now we need to pad it to be 8 ints long
+    coeff = remainder.coefficients + ([0] * (8 - len(remainder.coefficients)))
+    return Polynomial(coeff)
 
 def lsDegree(coefficients):
     # I can't find a simple way to find the index of last nonzero element of a list,
