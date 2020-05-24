@@ -56,6 +56,9 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
         else:
             return "0"
 
+    def __bool__(self):
+        return any(self.coefficients)
+
 
     def inverse(self):
         # EEA based off of wikipedia pseudocode
@@ -91,8 +94,24 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
     def asGenPoly(self):
         return GenPoly(self.coefficients[:])
 
+    def __int__(self):
+        output = 0
+        for i in range(8):
+            if self.coefficients[i]:
+                output += 2 ** i
+        return output
+
+
+
+ 
+
 def zeroByte():
     return BytePolynomial([0] * 8)
+
+def oneByte():
+    output = BytePolynomial([0] * 8)
+    output.coefficients[0] = 1
+    return output
 
 def mCoefficients():
     # Returns the coefficient array for the irreducible polynomial m used for multiplication
@@ -131,3 +150,4 @@ def lsDegree(coefficients):
         if coefficients[i]:
             return i
     return 0 #0 has degree 0.
+
