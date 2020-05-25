@@ -78,3 +78,12 @@ testInverse(x, xInverse)
 testInverse(xInverse, x)
 testMult(x, xInverse, BytePolynomial([1,0,0,0,0,0,0,0]))
 print("Done")
+
+print("Testing fromInt")
+c3 = BytePolynomial([0, 0, 1, 1, 1, 1, 0, 0])
+c3Int = 0x3c # Little Endian vs Big Endian
+actual = BytePolynomial.fromInt(c3Int)
+if actual.coefficients != c3.coefficients:
+    print("fromInt failed")
+    print("Expected: " + str(c3))
+    print("Actual: " + str(actual))

@@ -17,6 +17,15 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
                 raise ValueError("A polynomial in GF(2^8) has coefficients of zero or one.  Actual coefficient list: " + str(coefficients))
         self.coefficients = coefficients
 
+    @staticmethod
+    def fromInt(x):
+        x = int(x)
+        if x < 0 or x > 255:
+            raise ValueError("Tried to make a value of " + str(x) + " into a byte")
+        masked = [x & (1 << i) for i in range(8)]
+        bits = [masked[i] >> i for i in range(8)]
+        return BytePolynomial(bits)
+
     def __add__(self, other):
         # Section 4.1: "The addition of two elements in a finite field is achieved by 'adding' the coefficients for the corresponding powers in the polynomials for the two elements. The addition is performed with the XOR operation"
         new_coeff = [-1] * 8
@@ -61,6 +70,11 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
 
 
     def inverse(self):
+        if not any(self.coefficients):
+            # Special case -- `self` is zero
+            # Section 5.1.1: "Take the multiplicative inverse [...] the element {00} is mapped to itself"
+            return zeroByte()
+
         # EEA based off of wikipedia pseudocode
         old_s = GenPoly([1]) # IE, old_s = 1
         s = GenPoly([0]) #IE, s = 0
@@ -84,6 +98,9 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
         #print("Bézout coefficients:", old_s, old_t, sep=',')
         #print("greatest common divisor:", old_r)
         #print("quotients by the gcd:", t, s, sep=',')
+
+    def __eq__(self, other):
+        return self.coefficients == other.coefficients
 
     def degree(self):
         return lsDegree(self.coefficients)

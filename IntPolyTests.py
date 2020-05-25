@@ -47,3 +47,5 @@ print("(That may or may not be correct)")
 print("Testing modular product...")
 print("(",str(x),")", " {modular product} ", "(",str(y),")"," evaluates to ",str(x.modularProduct(y)), sep='')
 print("(That may or may not be correct)")
+
+# Do __mul__  and modular product ultimately perform the same operation?
