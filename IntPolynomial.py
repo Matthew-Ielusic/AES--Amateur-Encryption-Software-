@@ -25,7 +25,7 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
             # x^4 + 1"
         
         # Calculate the product
-        product = [zeroByte() for i in range(7)]
+        product = [Galois.zeroByte() for i in range(7)]
         for i in range(4):
             for j in range(4):
                 product[i + j] += self.coefficients[i] * other.coefficients[j]
@@ -55,7 +55,7 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
                 else:
                     output.append("x^" + str(i))
         if self.coefficients[1]:
-            byte = int(self.coefficients[i])
+            byte = int(self.coefficients[1])
             if byte:
                 if byte > 1:
                     output.append(str(byte) + "x")# Not x^1
@@ -63,6 +63,17 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
                     output.append("x")
         output.append(str(int(self.coefficients[0]))) # Certainly not x^0
         return " + ".join(output)
+
+    def __eq__(self, other):
+        if type(other) is IntPolynomial:
+            matches = [
+                        self.coefficients[i].coefficients == other.coefficients[i].coefficients 
+                        for i in range(4)
+                      ]
+            return all(matches)
+        else:
+            return False
+                
 
 # Special polynomial
 def a():
@@ -93,6 +104,7 @@ def modulo_x4(coeffList):
     while degree >= 4:
         coeffList[degree - 4] -= coeffList[degree]
         coeffList[degree] = Galois.zeroByte()
+        degree -= 1
 
 
 
