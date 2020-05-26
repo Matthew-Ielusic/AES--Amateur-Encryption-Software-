@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-
-
 from GeneralizedPoly import GenPoly
 import GeneralizedPoly
 # Section 3.2: "bytes are interpreted as finite field elements using a [degree-7] polynomial representation" (The finite field being GF(2^8), IE Galois finite field with 2**8=256 elements)
 
-class BytePolynomial: # Represents specifically a polynomial in GF(2^8)
+class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an eight-bit byte
     def __init__(self, coefficients):
         # coefficients[i] should be the coefficient of the term with degree i
         # (EG, coefficients[0] should be the constant)

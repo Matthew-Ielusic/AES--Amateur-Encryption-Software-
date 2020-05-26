@@ -1,15 +1,15 @@
 import IntPolynomial as IP
 import Galois
 
-eight  = Galois.BytePolynomial([0, 0, 0, 1, 0, 0, 0, 0])
-not8   = Galois.BytePolynomial([1, 1, 1, 0, 1, 1, 1, 1])
-zeroF  = Galois.BytePolynomial([0, 0, 0, 0, 1, 1, 1, 1])
-eightC = Galois.BytePolynomial([0, 0, 0, 1, 1, 0, 1, 1])
-eight2 = Galois.BytePolynomial([0, 0, 0, 1, 1, 0, 1, 1])
+zeroEight  = Galois.BytePolynomial([0, 0, 0, 1, 0, 0, 0, 0])
+not0x08   = Galois.BytePolynomial([1, 1, 1, 0, 1, 1, 1, 1])
+f0  = Galois.BytePolynomial([0, 0, 0, 0, 1, 1, 1, 1])
+c8 = Galois.BytePolynomial([0, 0, 0, 1, 1, 0, 1, 1])
+twoEight = Galois.BytePolynomial([0, 0, 0, 1, 1, 0, 1, 1])
 zero   = Galois.zeroByte()
 ff     = Galois.BytePolynomial([1, 1, 1, 1, 1, 1, 1, 1])
-fourTwo= Galois.BytePolynomial([0, 0, 1, 0, 0, 1, 0, 0])
-cf     = Galois.BytePolynomial([0, 0, 1, 1, 1, 1, 1, 1])
+twoFour= Galois.BytePolynomial([0, 0, 1, 0, 0, 1, 0, 0])
+fc     = Galois.BytePolynomial([0, 0, 1, 1, 1, 1, 1, 1])
 
 print("Testing IntPolynomial.__plus__ ...")
 def testAdd(x, y, expected):
@@ -21,9 +21,9 @@ def testAdd(x, y, expected):
         print("sum:      ", actual, sep='')
         print("expected: ", expected, sep='')
 
-x =        IP.IntPolynomial([eight, zeroF, fourTwo, eight])
-y =        IP.IntPolynomial([eight, zero,  eightC,  ff])
-expected = IP.IntPolynomial([zero,  zeroF, cf,      not8])
+x =        IP.IntPolynomial([zeroEight, f0, twoFour, zeroEight])
+y =        IP.IntPolynomial([zeroEight, zero,  c8,  ff])
+expected = IP.IntPolynomial([zero,  f0, fc,      not0x08])
 testAdd(x, y, expected)
 
 
