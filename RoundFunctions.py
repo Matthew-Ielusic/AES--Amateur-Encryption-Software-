@@ -42,3 +42,9 @@ def SubBytes(state):
     for r in range(4):
         for c in range(4):
             state[r][c] = sBox(state[r][c])
+
+def ShiftRows(state):
+    for r in range(1, 4): # ShiftRows does not change row 0
+        old = state[r][:]
+        for c in range(4):
+            state[r][c] = old[(r + c) % 4]
