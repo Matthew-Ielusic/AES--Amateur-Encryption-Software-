@@ -48,3 +48,13 @@ RoundFunctions.ShiftRows(state)
 for r in range(4):
 	for c in range(4):
 		assert state[r][c] == original[r][(c + r) % 4], "The byte in row " + str(r) + " and column " + str(c) + " was not shifted correctly."
+
+print("Done.")
+print("Testing MixColumns")
+
+aesExampleBytes = [[0x52, 0x85, 0xe3, 0xf6], [0xa4, 0x11, 0xcf, 0x50], [0xc8, 0x6a, 0x2f, 0x5e], [0x94, 0x28, 0xd7, 0x07]]
+state = RoundFunctions.State.from4x4([[Galois.BytePolynomial.fromInt(x) for x in y] for y in aesExampleBytes])
+RoundFunctions.MixColumns(state)
+bytesExpected = [[0x0f, 0x60, 0x6f, 0x5e], [0xd6, 0x31, 0xc0, 0xb3], [0xda, 0x38, 0x10, 0x13], [0xa9, 0xbf, 0x6b, 0x01]]
+bytesActual   = [[int(state[r][c]) for c in range(4)] for r in range(4)]
+assert bytesExpected == bytesActual, "MixColumns did not mix correctly.  Expected " + str(bytesExpected) + "; actual: " + str(bytesActual)

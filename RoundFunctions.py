@@ -1,4 +1,5 @@
 import Galois
+import IntPolynomial
 import numpy
 import operator 
 import functools
@@ -13,8 +14,23 @@ class State:
         self.data = [[input[row * 4 + column] for row in range(4)] for column in range(4)]
      # Section 3.4, Figure 3: s[r,c] = in[4*r + c]
 
+    @staticmethod
+    def from4x4(input):
+        if len(input) != 4 or any([len(ls) != 4 for ls in input]):
+            raise ValueError("The input was not a 4x4 list.  input: " + str(input))
+        out = State(range(16))
+        out.data = input[:4][:4]
+        return out
+
     def __getitem__(self, key):
          return self.data[key]
+
+    def getColumn(self, columnIndex):
+         return [self[i][columnIndex] for i in range(4)]
+
+    def setColumn(self, columnIndex, newColumn):
+         for i in range(4):
+             self[i][columnIndex] = newColumn[i]
 
 
 def sBoxMatrix():
@@ -48,3 +64,11 @@ def ShiftRows(state):
         old = state[r][:]
         for c in range(4):
             state[r][c] = old[(r + c) % 4]
+
+def MixColumns(state):
+    columns     = [state.getColumn(i) for i in range(4)]
+    polys       = [IntPolynomial.IntPolynomial(col) for col in columns]
+    products    = [poly * IntPolynomial.a() for poly in polys]
+    newColumns  = [[poly.coefficients[i] for i in range(4)]  for poly in products]
+    for i in range(4):
+        state.setColumn(i, newColumns[i])
