@@ -1,3 +1,10 @@
+# Hack sys.path to get code from the parent folder
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
+# </hack>
+
 import RoundFunctions
 import Galois
 import IntPolynomial
@@ -62,12 +69,13 @@ assert bytesExpected == bytesActual, "MixColumns did not mix correctly.  Expecte
 
 print("Done.")
 print("Testing AddRoundKey")
+raise NotImplementedError
 input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
 state = RoundFunctions.State(input)
 roundKey = [IntPolynomial.IntPolynomial([Galois.BytePolynomial.fromInt(i*4) for i in range(4)])]*4
 RoundFunctions.AddRoundKey(state, roundKey)
 for r in range(4):
 	for c in range(4):
-		expected = r
+		expected = None #???
 		assert int(state[r][c]) == expected, f'Expected {expected}, got {state[r][c]}'
 print("Done.")

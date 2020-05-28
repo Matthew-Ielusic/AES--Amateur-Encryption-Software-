@@ -1,5 +1,11 @@
-from KeySchedule import KeySchedule
+# Hack sys.path to get code from the parent folder
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
+# </hack>
 
+from KeySchedule import KeySchedule
 # Appendex A.1
 key = 0x2b7e151628aed2a6abf7158809cf4f3c
 w0 = 0x2b7e1516 

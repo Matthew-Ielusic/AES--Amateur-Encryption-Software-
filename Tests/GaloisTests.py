@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# Hack sys.path to get code from the parent folder
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
+# </hack>
+
 from Galois import BytePolynomial
 
 def testAdd(x, y, expected):

@@ -2,7 +2,7 @@ import RoundFunctions
 import KeySchedule
 import Constants as C
 import Galois
-def EncrpytBlock(inputByteArray, keyInt):
+def EncryptBlock(inputByteArray, keyInt):
     state = RoundFunctions.State([Galois.BytePolynomial.fromInt(b) for b in inputByteArray])
     keySchedule = KeySchedule.KeySchedule(keyInt)
 
