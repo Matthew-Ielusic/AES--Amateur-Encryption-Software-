@@ -64,7 +64,7 @@ print("Done.")
 print("Testing AddRoundKey")
 input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
 state = RoundFunctions.State(input)
-roundKey = IntPolynomial.IntPolynomial([Galois.BytePolynomial.fromInt(i*4) for i in range(4)])
+roundKey = [IntPolynomial.IntPolynomial([Galois.BytePolynomial.fromInt(i*4) for i in range(4)])]*4
 RoundFunctions.AddRoundKey(state, roundKey)
 for r in range(4):
 	for c in range(4):

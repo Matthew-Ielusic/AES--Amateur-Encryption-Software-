@@ -77,7 +77,7 @@ def MixColumns(state):
         state.setColumn(i, newColumns[i])
 
 
-def AddRoundKey(state, roundKey):
+def AddRoundKey(state, roundKeys):
     for r in range(4):
         for c in range(4):
-            state[r][c] = state[r][c] + roundKey[c]
+            state[r][c] = state[r][c] + roundKeys[c][3-r]
