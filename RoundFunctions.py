@@ -32,6 +32,9 @@ class State:
          for i in range(4):
              self[i][columnIndex] = newColumn[i]
 
+    def asList(self):
+        return [int(self.data[r][c]) for r in range(4) for c in range(4)]
+
 
 def sBoxMatrix():
     matrix = [ [int(((i + j) % 8) >= 3) for j in range(8)] for i in range(8)]
@@ -72,3 +75,9 @@ def MixColumns(state):
     newColumns  = [[poly.coefficients[i] for i in range(4)]  for poly in products]
     for i in range(4):
         state.setColumn(i, newColumns[i])
+
+
+def AddRoundKey(state, roundKey):
+    for r in range(4):
+        for c in range(4):
+            state[r][c] = state[r][c] + roundKey[c]

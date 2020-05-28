@@ -66,6 +66,13 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an ei
     def __bool__(self):
         return any(self.coefficients)
 
+    def __pow__(self, power):
+        output = oneByte()
+        while power > 0:
+            power -= 1
+            output *= self
+        return output
+
 
     def inverse(self):
         if not any(self.coefficients):

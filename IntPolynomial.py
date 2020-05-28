@@ -9,6 +9,10 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
         if any([type(c) is not Galois.BytePolynomial for c in coefficients]):
             raise ValueError("An IntPoy has coefficients in GF(2^8).  Actual coefficient list: " + str(coefficients))
         self.coefficients = coefficients
+
+    @staticmethod
+    def zero():
+        return IntPolynomial([Galois.zeroByte()] * 4)
     
     def __add__(self, other):
         # Section 4.3: "Addition is performed by adding the finite field
@@ -73,6 +77,15 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
             return all(matches)
         else:
             return False
+
+    def __int__(self):
+        ints = [int(c) for c in self.coefficients]
+        return sum([ints[i] << (i*8) for i in range(4)])
+
+    def __getitem__(self, key):
+        return self.coefficients[key]
+    def __setitem__(self, key, value):
+        self.coefficients[key] = value
                 
 
 # Special polynomial

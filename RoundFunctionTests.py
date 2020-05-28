@@ -1,5 +1,6 @@
 import RoundFunctions
 import Galois
+import IntPolynomial
 
 input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
 state = RoundFunctions.State(input)
@@ -58,3 +59,15 @@ RoundFunctions.MixColumns(state)
 bytesExpected = [[0x0f, 0x60, 0x6f, 0x5e], [0xd6, 0x31, 0xc0, 0xb3], [0xda, 0x38, 0x10, 0x13], [0xa9, 0xbf, 0x6b, 0x01]]
 bytesActual   = [[int(state[r][c]) for c in range(4)] for r in range(4)]
 assert bytesExpected == bytesActual, "MixColumns did not mix correctly.  Expected " + str(bytesExpected) + "; actual: " + str(bytesActual)
+
+print("Done.")
+print("Testing AddRoundKey")
+input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
+state = RoundFunctions.State(input)
+roundKey = IntPolynomial.IntPolynomial([Galois.BytePolynomial.fromInt(i*4) for i in range(4)])
+RoundFunctions.AddRoundKey(state, roundKey)
+for r in range(4):
+	for c in range(4):
+		expected = r
+		assert int(state[r][c]) == expected, f'Expected {expected}, got {state[r][c]}'
+print("Done.")
