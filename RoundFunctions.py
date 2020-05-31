@@ -33,7 +33,8 @@ class State:
              self[i][columnIndex] = newColumn[i]
 
     def asList(self):
-        return [int(self.data[r][c]) for r in range(4) for c in range(4)]
+        # Column 0 is self.asList[0:4], column 1 is self.asList()[4:8], and so on
+        return [int(self.data[c][r]) for r in range(4) for c in range(4)]
 
 
 def sBoxMatrix():
@@ -81,3 +82,4 @@ def AddRoundKey(state, roundKeys):
     for r in range(4):
         for c in range(4):
             state[r][c] = state[r][c] + roundKeys[c][3-r]
+
