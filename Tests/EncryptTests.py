@@ -18,7 +18,7 @@ cipherKeyBytes = bytes([0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0x
 
 expectedOutput = [0x39, 0x25, 0x84, 0x1d, 0x2, 0xdc, 0x9, 0xfb, 0xdc, 0x11, 0x85, 0x97, 0x19, 0x6a, 0xb, 0x32]
 
-actualOutput = Encrypt.EncryptBlock(input, cipherKey)
+actualOutput = Encrypt.EncryptBlock(cipherKeyBytes, input)
 
 assert actualOutput == expectedOutput, f'Expected {expectedOutput}, got {actualOutput}'
 print("Done")
@@ -26,8 +26,17 @@ print("Done")
 print("Testing against pycrypto")
 pycrypto = AES.new(cipherKeyBytes, AES.MODE_ECB)
 cipherTextBytes = pycrypto.encrypt(bytes(input))
-print([hex(a) for a in not_bytes])
-assert not_bytes == actualOutput, f'The test against pycrypto failed -- expected {actualOutput}, got {not_bytes}'
+expected = [int(b) for b in cipherTextBytes]
+assert expected == actualOutput, f'The test against pycrypto failed -- expected {expected}, got {not_bytes}'
+
+
+input = b'123456789aBcDeF_'
+key   = b'0xdeadBEEFcabEA3'
+
+pycrypto = AES.new(key, AES.MODE_ECB)
+expected = [int(b) for b in pycrypto.encrypt(input)]
+actual = Encrypt.EncryptBlock(key, input)
+assert expected == actual, f'The test against pycrypto failed -- expected {expected}, got {actual}'
 print("done")
 
 

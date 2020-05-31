@@ -5,12 +5,13 @@ import Constants as C
 
 class KeySchedule():
     # Amateur Encryption Software supports Nk = 4 (128 bits) only
-    def __init__(self, cipherKey):
-        # Thanks stack overflow -- https://stackoverflow.com/questions/6187699/how-to-convert-integer-value-to-array-of-four-bytes-in-python
-        keyBytes = [Galois.BytePolynomial.fromInt((cipherKey >> i) & 0xff) for i in range(120, -1, -8)]
+    def __init__(self, cipherKeyBytes):
+        if len(cipherKeyBytes) != C.Nk() * 4:
+            raise ValueError("This implementation of AES supports 128-bit keys only")
+        keyBytes = [Galois.BytePolynomial.fromInt(b) for b in cipherKeyBytes]
         # Reverse the endianness of each 4-byte word
-        w = [IntPolynomial(keyBytes[3::-1])] + [IntPolynomial(keyBytes[i+3:i-1:-1]) for i in (4, 8, 12)]
         # Sadly, keyBytes[3:-1:-1] = [] 
+        w = [IntPolynomial(keyBytes[3::-1])] + [IntPolynomial(keyBytes[i+3:i-1:-1]) for i in (4, 8, 12)]
         for i in range(C.Nk(), C.Nb() * (C.Nr() + 1)):
             temp = w[i - 1]
             if i % C.Nk() == 0:
@@ -20,10 +21,17 @@ class KeySchedule():
                 temp = SubWord(RotWord(temp)) + Rcon(int(i / C.Nk()))
             w.append(w[i - C.Nk()] + temp)
 
-        self.roundKeys = w
+        self._roundKeys = w
+        self._roundNumber = 0
+        self._roundSize = 4
+
+    def next(self):
+        output = self._roundKeys[self._roundNumber : self._roundNumber + self._roundSize]
+        self._roundNumber += self._roundSize
+        return output
 
     def __getitem__(self, key):
-        return self.roundKeys[key]
+        return self._roundKeys[key]
 
 #temp = w[i-1]
 # if (i mod Nk = 0)
