@@ -37,6 +37,20 @@ class TestEncrypt(unittest.TestCase):
 		actual = amateur.encryptBlock(input)
 		self.assertEqual(expected, actual, "The test against pycrypto failed")
 
+
+	def test_cbc(self):
+		key   = b'dsainvfopinpo389'
+		iv    = b'initial vector__'
+		input = [b'0123456789abcdef', b'0123456789abcdef', b'fedcba9876543210', b'0123456789abcdef']
+
+		pycrypto = AES.new(key, AES.MODE_CBC, iv)
+		amateur = Encrypt.AmateurEncrypt(key)
+
+		expected = [bytes(pycrypto.encrypt(i)) for i in input]
+		actual = [bytes(a) for a in amateur.cbc(input, iv)]
+		self.assertEqual(expected, actual, "CBC mode encryption failed")
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

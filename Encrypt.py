@@ -2,6 +2,7 @@ import RoundFunctions
 import KeySchedule
 import Constants as C
 import Galois
+import operator
 
 class AmateurEncrypt:
     def __init__(self, keyByteList):
@@ -30,3 +31,18 @@ class AmateurEncrypt:
         self.keySchedule.reset()
         return state.asList()
 
+    def cbc(self, inputBlocks, iv):
+        if len(iv) is not 16:
+            raise ValueError("The IV was not a flat list of 16 byte-like objects")
+
+        cipherText = []
+        previous = iv
+        for block in inputBlocks:
+            if len(block) is not 16:
+                raise ValueError("The inputBlocks must be a list of lists of 16 byte-like objects")
+            
+            block = list(map(operator.xor, block, previous))
+            cipherText.append(self.encryptBlock(block))
+            previous = cipherText[-1]
+
+        return cipherText
