@@ -22,5 +22,5 @@ if __name__ == '__main__':
         unittest.main()
     except SystemExit:
         # unittest & my IDE don't play nice
-        # It raises a SystemExit when it finishes
+        # unittest raises a SystemExit when it finishes
         pass

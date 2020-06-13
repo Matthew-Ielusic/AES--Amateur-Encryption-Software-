@@ -9,107 +9,71 @@ sys.path.insert(0,parentdir)
 
 
 from GeneralizedPoly import GenPoly
+import unittest
 
-print("Testing add...")
+class TestGenPoly(unittest.TestCase):
+    def test_add(self):
+        x =   GenPoly([1,0])
+        y =   GenPoly([1,0,1])
+        sum = GenPoly([0,0,1])
+        self.assertEqual(sum, x+y, "GenPoly's __add__ failed")
 
+        x =   GenPoly([1,1,1,0,1,0,1,0])
+        y =   GenPoly([1,1,0,0,0,0,0,1])
+        sum = GenPoly([0,0,1,0,1,0,1,1])
+        self.assertEqual(sum, x+y, "GenPoly's __add__ failed")
 
-def testAdd(x, y, expected):
-    actual = x + y
-    if not (actual.coefficients == expected.coefficients):
-        print("add failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("sum:      ", actual, sep='')
-        print("expected: ", expected, sep='')
+    def test_mult(self):
+        x =   GenPoly([1,1,1,0,1,0,1,0])
+        y =   GenPoly([1,1,0,0,0,0,0,1])
+        prd = GenPoly([1,0,0,1,1,1,1,0,1,1,0,1,0,1])
+        self.assertEqual(prd, x*y, "GenPoly's __mul__ failed")
 
-x =   GenPoly([1,0])
-y =   GenPoly([1,0,1])
-sum = GenPoly([0,0,1])
-testAdd(x, y, sum)
+        x   = GenPoly([1, 0, 0, 0])
+        y   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        prd = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(prd, x*y, "GenPoly's __mul__ failed")
 
-x =   GenPoly([1,1,1,0,1,0,1,0])
-y =   GenPoly([1,1,0,0,0,0,0,1])
-sum = GenPoly([0,0,1,0,1,0,1,1])
-testAdd(x,y,sum) 
+        x   = GenPoly([0, 1, 0, 0])
+        y   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        prd = GenPoly([0, 0, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(prd, x*y, "GenPoly's __mul__ failed")
+        
+        x   = GenPoly([1, 0, 1, 1])
+        y   = GenPoly([0, 1, 1, 1, 0, 1, 1])
+        prd = GenPoly([0, 1, 1, 0, 0, 1, 0, 1, 0, 1])
+        self.assertEqual(prd, x*y, "GenPoly's __mul__ failed")
 
-x =   GenPoly([1, 0, 1, 0, 0, 1, 0, 1])
-y =   GenPoly([0, 1, 0, 1, 1, 1])
-sum = GenPoly([1, 1, 1, 1, 1, 0, 0, 1])
-testAdd(x, y, sum)
+    def test_div(self):
+        x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        y   = GenPoly([1, 0, 0, 0])
+        quo = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(quo, x / y, "GenPoly's __truediv__ failed")
 
-print("Done.")
+        x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        y   = GenPoly([1, 0, 0, 0])
+        quo = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        self.assertEqual(quo, x / y, "GenPoly's __truediv__ failed")
+        
+        x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        y   = GenPoly([0, 1, 0, 0])
+        quo = GenPoly([1, 1, 1, 1, 1, 1])
+        self.assertEqual(quo, x / y, "GenPoly's __truediv__ failed")
 
-print("Testing multiplication...")
+        x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
+        y   = GenPoly([0, 0, 1, 0])
+        quo = GenPoly([1, 1, 1, 1, 1])
+        self.assertEqual(quo, x / y, "GenPoly's __truediv__ failed")
 
-def testMult(x, y, expected):
-    actual = x * y
-    if not (actual.coefficients == expected.coefficients):
-        print("multiplication failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("product:  ", actual, sep='')
-        print("expected: ", expected, sep='')
+        x   = GenPoly([1, 1, 0, 1, 0, 1, 0, 0, 1, 0])
+        y   = GenPoly([1, 0, 1, 0])
+        quo = GenPoly([1, 0, 1, 1, 1, 0, 1])
+        self.assertEqual(quo, x / y, "GenPoly's __truediv__ failed")
 
-x =   GenPoly([1,1,1,0,1,0,1,0])
-y =   GenPoly([1,1,0,0,0,0,0,1])
-prd = GenPoly([1,0,0,1,1,1,1,0,1,1,0,1,0,1])
-testMult(x,y,prd) 
-
-x   = GenPoly([1, 0, 0, 0])
-y   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-prd = GenPoly([0, 1, 1, 1, 1, 1, 1])
-testMult(x,y,prd) 
-
-x   = GenPoly([1, 0, 0, 0])
-y   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-prd = GenPoly([0, 1, 1, 1, 1, 1, 1])
-testMult(x,y,prd) 
-
-x   = GenPoly([0, 1, 0, 0])
-y   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-prd = GenPoly([0, 0, 1, 1, 1, 1, 1, 1])
-testMult(x,y,prd) 
-
-x   = GenPoly([1, 0, 1, 1])
-y   = GenPoly([0, 1, 1, 1, 0, 1, 1])
-prd = GenPoly([0, 1, 1, 0, 0, 1, 0, 1, 0, 1])
-testMult(x,y,prd) 
-print("Done.")
-
-print("Testing division...")
-
-def testDiv(x, y, expected):
-    actual = x / y
-    if not (actual.coefficients == expected.coefficients):
-        print("division failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("quotient: ", actual, sep='')
-        print("expected: ", expected, sep='')
-
-x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-y   = GenPoly([1, 0, 0, 0])
-quo = GenPoly([0, 1, 1, 1, 1, 1, 1])
-testDiv(x, y, quo)
-
-x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-y   = GenPoly([1, 0, 0, 0])
-quo = GenPoly([0, 1, 1, 1, 1, 1, 1])
-testDiv(x, y, quo)
-
-x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-y   = GenPoly([0, 1, 0, 0])
-quo = GenPoly([1, 1, 1, 1, 1, 1])
-testDiv(x, y, quo)
-
-x   = GenPoly([0, 1, 1, 1, 1, 1, 1])
-y   = GenPoly([0, 0, 1, 0])
-quo = GenPoly([1, 1, 1, 1, 1])
-testDiv(x, y, quo)
-
-x   = GenPoly([1, 1, 0, 1, 0, 1, 0, 0, 1, 0])
-y   = GenPoly([1, 0, 1, 0])
-quo = GenPoly([1, 0, 1, 1, 1, 0, 1])
-testDiv(x, y, quo)
-
-print("Done.")
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except SystemExit:
+        # unittest & my IDE don't play nice
+        # unittest raises a SystemExit when it finishes
+        pass

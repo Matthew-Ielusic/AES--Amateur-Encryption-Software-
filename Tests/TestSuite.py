@@ -1,11 +1,14 @@
 import unittest
 from EncryptTests import TestEncrypt
 from DecryptTests import TestDecrypt
+from GaloisTests import TestBytePoly
+from GenPolyTests import TestGenPoly
+from IntPolyTests import TestIntPoly
+from KeyScheduleTests import TestKeySchedule
+from RoundFunctionTests import TestState
+from RoundFunctionTests import TestForward
+from RoundFunctionTests import TestBackward
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(TestEncrypt('test_encrypt'))
-    return suite
 
 if __name__ == '__main__':
     try:

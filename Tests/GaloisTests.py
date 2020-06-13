@@ -8,89 +8,58 @@ sys.path.insert(0,parentdir)
 # </hack>
 
 from Galois import BytePolynomial
+import unittest
 
-def testAdd(x, y, expected):
-    actual = x + y
-    if not (actual.coefficients == expected.coefficients):
-        print("add failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("sum: ", actual, sep='')
-        print("expected: ", expected, sep='')
-        
-def testMult(x, y, expected):
-    actual = x * y
-    if not (actual.coefficients == expected.coefficients):
-        print("multiplication failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("product: ", actual, sep='')
-        print("expected: ", expected, sep='')
-        
-def testDiv(x, y, expected):
-    actual = x / y
-    if not (actual.coefficients == expected.coefficients):
-        print("division failed")
-        print("x: ", x, sep='')
-        print("y: ", y, sep='')
-        print("quotient: ", actual, sep='')
-        print("expected: ", expected, sep='')
-        
-        
-        
-x = BytePolynomial([1,1,1,0,1,0,1,0])
-y = BytePolynomial([1,1,0,0,0,0,0,1])
+class TestBytePoly(unittest.TestCase):
+    def test_add(self):
+        x =   BytePolynomial([1,1,1,0,1,0,1,0])
+        y =   BytePolynomial([1,1,0,0,0,0,0,1])
+        sum = BytePolynomial([0,0,1,0,1,0,1,1])
+        self.assertEqual(sum, x+y, "BytePolynomial's __add__ failed")
 
-added = BytePolynomial([0,0,1,0,1,0,1,1])
-multiplied = BytePolynomial([1,0,0,0,0,0,1,1])
+    def test_mult(self):
+        x =       BytePolynomial([1,1,1,0,1,0,1,0])
+        y =       BytePolynomial([1,1,0,0,0,0,0,1]) 
+        product = BytePolynomial([1,0,0,0,0,0,1,1])
+        self.assertEqual(product, x*y, "BytePolynomial's __mul__ failed")
+        self.assertEqual(product, y*x, "BytePolynomial's __mul__ failed")
+    
+    def test_div(self):
+        x    =   BytePolynomial([1,1,1,0,1,0,1,0])
+        y    =   BytePolynomial([1,1,0,0,0,0,0,1])
+        deg7 = BytePolynomial([0,0,0,0,0,0,0,1])
+        deg0 = BytePolynomial([1,0,0,0,0,0,0,0])
+        deg2 = BytePolynomial([1,0,1,0,0,0,0,0]) #x^2 + 1
+        deg1 = BytePolynomial([1,1,0,0,0,0,0,0]) #x + 1
+        zero = BytePolynomial([0,0,0,0,0,0,0,0])
+        self.assertEqual(zero, zero / deg7, "BytePolynomial's __truediv__ failed")
+        self.assertEqual(zero, zero / deg2, "BytePolynomial's __truediv__ failed")
+        self.assertEqual(deg1, deg2 / deg1, "BytePolynomial's __truediv__ failed")
+        self.assertEqual(x, x / deg0, "BytePolynomial's __truediv__ failed")
+        self.assertEqual(y, y / deg0, "BytePolynomial's __truediv__ failed")
+        self.assertEqual(zero, x / y ,"BytePolynomial's __truediv__ failed") 
+        self.assertEqual(BytePolynomial([0,1,1,1,1,1,1,0]), y / deg1,"BytePolynomial's __truediv__ failed")
 
-print("Testing add...")
-testAdd(x,y,added) # Add is simple
-print("Done.")
+    def test_inverse(self):
+        x = BytePolynomial([0,1,0,0,0,0,0,0])
+        xInverse = BytePolynomial([1, 0, 1, 1, 0, 0, 0, 1])
+        self.assertEqual(xInverse, x.inverse(), "BytePolynomial's inverse failed")
+        self.assertEqual(x, xInverse.inverse(), "BytePolynomial's inverse failed")
+        one = BytePolynomial([1,0,0,0,0,0,0,0])
+        self.assertEqual(one, x * xInverse, "BytePolynomial times its inverse was not one")
 
-print("Testing multiplication...")
-testMult(x,y,multiplied) # Multiplication is complex, but there is a complicated test case
-print("Done.")
+    def test_fromInt(self):
+        c3 = BytePolynomial([0, 0, 1, 1, 1, 1, 0, 0])
+        c3Int = 0x3c # Little Endian vs Big Endian
+        actual = BytePolynomial.fromInt(c3Int)
+        self.assertEqual(c3, actual, "BytePolynomial's fromInt failed")
 
-# Let's do a lot of testing of division
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except SystemExit:
+        # unittest & my IDE don't play nice
+        # unittest raises a SystemExit when it finishes
+        pass
 
-print("Testing division...")
-deg7 = BytePolynomial([0,0,0,0,0,0,0,1])
-deg0 = BytePolynomial([1,0,0,0,0,0,0,0])
-deg2 = BytePolynomial([1,0,1,0,0,0,0,0]) #x^2 + 1
-deg1 = BytePolynomial([1,1,0,0,0,0,0,0]) #x + 1
-zero = BytePolynomial([0,0,0,0,0,0,0,0])
-testDiv(zero, deg7, zero)
-testDiv(zero, deg2, zero)
-testDiv(deg2, deg1, deg1)
-testDiv(x, deg0, x)
-testDiv(y, deg0, y)
-testDiv(x,y,zero) 
-testDiv(y,deg1,BytePolynomial([0,1,1,1,1,1,1,0]))
-print("Done.")
 
-print("Testing inverse...")
-
-def testInverse(x, expected):
-    actual = x.inverse()
-    if not (actual.coefficients == expected.coefficients):
-        print("inverse failed")
-        print("x: ", x, sep='')
-        print("actual: ", actual, sep='')
-        print("expected: ", expected, sep='')
-       
-x = BytePolynomial([0,1,0,0,0,0,0,0])
-xInverse = BytePolynomial([1, 0, 1, 1, 0, 0, 0, 1])
-testInverse(x, xInverse)
-testInverse(xInverse, x)
-testMult(x, xInverse, BytePolynomial([1,0,0,0,0,0,0,0]))
-print("Done")
-
-print("Testing fromInt")
-c3 = BytePolynomial([0, 0, 1, 1, 1, 1, 0, 0])
-c3Int = 0x3c # Little Endian vs Big Endian
-actual = BytePolynomial.fromInt(c3Int)
-if actual.coefficients != c3.coefficients:
-    print("fromInt failed")
-    print("Expected: " + str(c3))
-    print("Actual: " + str(actual))

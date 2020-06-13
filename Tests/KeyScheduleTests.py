@@ -8,41 +8,44 @@ sys.path.insert(0,parentdir)
 from KeySchedule import KeySchedule
 from KeySchedule import InverseKeySchedule
 import Constants
+import unittest
 
-print("Testing InverseKeySchedule")
-key = range(16)
-sch = KeySchedule(key)
-inv = InverseKeySchedule(key)
+class TestKeySchedule(unittest.TestCase):
+    def test_schedule_init(self):
+        # Appendex A.1
+        key = [0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c]
+        schedule = KeySchedule(key)
+        
+        w0 = 0x2b7e1516 
+        k0 = int(schedule.roundKeys[0])
+        self.assertEqual(w0, k0, "KeySchedule initialization failed")
 
-for i in range(Constants.Nr()):
-    j = (Constants.Nr() * Constants.Nb()) - (i*4)
-    nx = inv.next()
-    assert [int(k) for k in nx] == [int(k) for k in sch.roundKeys[j:j+4]], "Inverse keys schedule was wrong"
+        w1 = 0x28aed2a6
+        k1 = int(schedule.roundKeys[1])
+        self.assertEqual(w1, k1, "KeySchedule initialization failed")
+        
+        w2 = 0xabf71588 
+        k2 = int(schedule.roundKeys[2])
+        self.assertEqual(w2, k2, "KeySchedule initialization failed")
+        
+        w3 = 0x09cf4f3c 
+        k3 = int(schedule.roundKeys[3])
+        self.assertEqual(w3, k3, "KeySchedule initialization failed")
+        
+    def test_inverse_schedule(self):
+        key = range(16)
+        sch = KeySchedule(key)
+        inv = InverseKeySchedule(key)
 
-print("Done")
+        for i in range(Constants.Nr()):
+            j = (Constants.Nr() * Constants.Nb()) - (i*4)
+            nx = inv.next()
+            self.assertEqual([int(k) for k in sch.roundKeys[j:j+4]], [int(k) for k in nx], "Inverse keys schedule was wrong")
 
-raise NotImplementedError
-# Appendex A.1
-key = 0x2b7e151628aed2a6abf7158809cf4f3c
-w0 = 0x2b7e1516 
-w1 = 0x28aed2a6
-w2 = 0xabf71588 
-w3 = 0x09cf4f3c 
-schedule = KeySchedule(key)
-
-print("Testing key schedule initialization")
-assert int(schedule.roundKeys[0]) == w0, "Expected " + hex(int(w0)) + "; got " + hex(int(schedule.roundKeys[0]))
-assert int(schedule.roundKeys[1]) == w1, "Expected " + str(int(w1)) + "; got " + str(int(schedule.roundKeys[1]))
-assert int(schedule.roundKeys[2]) == w2, "Expected " + str(int(w2)) + "; got " + str(int(schedule.roundKeys[2]))
-assert int(schedule.roundKeys[3]) == w3, "Expected " + str(int(w3)) + "; got " + str(int(schedule.roundKeys[3]))
-print("Done")
-
-print("Testing snippets of the keys schedule")
-w13 = 0x4716fe3e 
-assert int(schedule.roundKeys[13]) == w13, "Expected " + hex(int(w13)) + "; got " + hex(int(schedule.roundKeys[13]))
-w24 = 0x6d88a37a
-assert int(schedule.roundKeys[24]) == w24, "Expected " + hex(int(w24)) + "; got " + hex(int(schedule.roundKeys[24]))
-w43 = 0xb6630ca6
-assert int(schedule.roundKeys[43]) == w43, "Expected " + hex(int(w43)) + "; got " + hex(int(schedule.roundKeys[43]))
-print("Done")
-
+if __name__ == '__main__':
+    try:
+        unittest.main() 
+    except SystemExit:
+        # unittest & my IDE don't play nice
+        # It raises a SystemExit when it finishes
+        pass

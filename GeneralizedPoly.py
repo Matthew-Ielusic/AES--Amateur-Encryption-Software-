@@ -83,6 +83,9 @@ class GenPoly:
         else:
             return "0"
 
+    def __eq__(self, other):
+        return self.coefficients == other.coefficients
+
     def copy(self):
         return GenPoly(self.coefficients)
 

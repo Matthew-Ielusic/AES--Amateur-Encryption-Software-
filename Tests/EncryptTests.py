@@ -23,7 +23,7 @@ class TestEncrypt(unittest.TestCase):
 		self.assertEqual(expectedOutput, actualOutput, "The test against the example in Appendix B failed")
 	def test_against_pycrypto(self):
 		input = b'123456789aBcDeF_'
-		key   = b'0xdeadBEEFcabEA3'
+		key   = b'!!deadBEEFcabEA3'
 		pycrypto = AES.new(key, AES.MODE_ECB)
 		expected = [int(b) for b in pycrypto.encrypt(input)]
 		actual = Encrypt.EncryptBlock(key, input)
@@ -34,5 +34,5 @@ if __name__ == '__main__':
         unittest.main()
     except SystemExit:
         # unittest & my IDE don't play nice
-        # It raises a SystemExit when it finishes
+        # unittest raises a SystemExit when it finishes
         pass
