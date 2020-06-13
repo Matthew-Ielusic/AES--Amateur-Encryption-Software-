@@ -19,14 +19,22 @@ class TestEncrypt(unittest.TestCase):
 		cipherKeyBytes = bytes([0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c])
 
 		expectedOutput = [0x39, 0x25, 0x84, 0x1d, 0x2, 0xdc, 0x9, 0xfb, 0xdc, 0x11, 0x85, 0x97, 0x19, 0x6a, 0xb, 0x32]
-		actualOutput = Encrypt.EncryptBlock(cipherKeyBytes, input)
+		encrypter = Encrypt.AmateurEncrypt(cipherKeyBytes)
+		actualOutput = encrypter.encryptBlock(input)
 		self.assertEqual(expectedOutput, actualOutput, "The test against the example in Appendix B failed")
+
 	def test_against_pycrypto(self):
 		input = b'123456789aBcDeF_'
 		key   = b'!!deadBEEFcabEA3'
 		pycrypto = AES.new(key, AES.MODE_ECB)
+		amateur = Encrypt.AmateurEncrypt(key)
 		expected = [int(b) for b in pycrypto.encrypt(input)]
-		actual = Encrypt.EncryptBlock(key, input)
+		actual = amateur.encryptBlock(input)
+		self.assertEqual(expected, actual, "The test against pycrypto failed")
+
+		input = b'!@#$%^&*()_+{}|<'
+		expected = [int(b) for b in pycrypto.encrypt(input)]
+		actual = amateur.encryptBlock(input)
 		self.assertEqual(expected, actual, "The test against pycrypto failed")
 
 if __name__ == '__main__':

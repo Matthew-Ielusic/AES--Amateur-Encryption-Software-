@@ -22,9 +22,10 @@ class KeySchedule():
             w.append(w[i - C.Nk()] + temp)
 
         self.roundKeys = w
-        self._roundNumber = 0
         self._roundSize = 4
         self._roundDirection = 1
+        self._roundNumber = 0
+        self._initialRoundNumber = 0
 
     def next(self):
         output = self.roundKeys[self._roundNumber : self._roundNumber + self._roundSize]
@@ -41,6 +42,9 @@ class KeySchedule():
             return self._roundNumber >= 0
         else:
             raise ValueError("Illegal value for self._roundDirection")
+
+    def reset(self):
+        self._roundNumber = self._initialRoundNumber
 
     def __getitem__(self, key):
         return self.roundKeys[key]
@@ -64,5 +68,6 @@ def Rcon(i):
 def InverseKeySchedule(cipherKeyBytes):
     schedule = KeySchedule(cipherKeyBytes)
     schedule._roundNumber = C.Nr() * C.Nb()
+    schedule._initialRoundNumber = schedule._roundNumber
     schedule._roundDirection = -1
     return schedule

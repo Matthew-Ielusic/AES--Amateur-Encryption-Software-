@@ -42,6 +42,22 @@ class TestKeySchedule(unittest.TestCase):
             nx = inv.next()
             self.assertEqual([int(k) for k in sch.roundKeys[j:j+4]], [int(k) for k in nx], "Inverse keys schedule was wrong")
 
+    def test_reset(self):
+        key = range(0, 32, 2)
+        sch = KeySchedule(key)
+        initial = sch.next()
+        while sch.hasNext():
+            sch.next()
+        sch.reset()
+        self.assertEqual(initial, sch.next(), "KeySchedule's reset failed")
+
+        inv = InverseKeySchedule(key)
+        initial = inv.next()
+        while inv.hasNext():
+            inv.next()
+        inv.reset()
+        self.assertEqual(initial, inv.next(), "InverseKeySchedule's reset failed")
+
 if __name__ == '__main__':
     try:
         unittest.main() 
