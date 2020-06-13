@@ -2,6 +2,7 @@ import RoundFunctions
 import KeySchedule
 import Constants as C
 import Galois
+import operator
 
 class AmateurDecrypt:
     def __init__(self, keyByteList):
@@ -29,3 +30,21 @@ class AmateurDecrypt:
 
         self.keySchedule.reset()
         return state.asList()
+
+    def cbc(self, inputBlocks, iv):
+        if len(iv) is not 16:
+            raise ValueError("The IV was not a flat list of 16 byte-like objects")
+
+        plainText = []
+        previous = iv
+        for block in inputBlocks:
+            if len(block) is not 16:
+                raise ValueError("The inputBlocks must be a list of lists of 16 byte-like objects")
+            
+            partialDecryption = self.decryptBlock(block)
+            fullDecryption = list(map(operator.xor, partialDecryption, previous))
+            previous = block
+            
+            plainText.append(fullDecryption)
+
+        return plainText

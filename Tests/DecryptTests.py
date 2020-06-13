@@ -25,6 +25,18 @@ class TestDecrypt(unittest.TestCase):
         roundTrip = decrypter.decryptBlock(encrypter.encryptBlock(input))
         self.assertEqual(input, roundTrip, "Decryption round-trip failed")
 
+    def test_cbc(self):
+        key   = b'dsai13874*npo389'
+        iv    = b'initial-vector__'
+        input = [b'0123dsaf89abcdef', b'0123456789abcdef', b'fedcb!!!!6543210', b'0123456789abcdef']
+
+        decrypter = Decrypt.AmateurDecrypt(key)
+        encrypter = Encrypt.AmateurEncrypt(key)
+
+        cipherText = encrypter.cbc(input, iv)
+        roundTrip = [bytes(rt) for rt in decrypter.cbc(cipherText, iv)]
+        self.assertEqual(input, roundTrip, "CBC-mode decryption failed")
+
 if __name__ == '__main__':
     try:
         unittest.main()
