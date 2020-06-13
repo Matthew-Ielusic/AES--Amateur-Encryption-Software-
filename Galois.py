@@ -38,13 +38,11 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an ei
     def __mul__(self, other):
         # "multiplication in GF(2^8) (denoted by •) corresponds with the multiplication of polynomials modulo an irreducible polynomial of degree 8."
         product = self.asGenPoly() * other.asGenPoly()
-        # Defer implementation of multiplation to that in GenPoly
-
         # But then return the product modulo m = 1 + x + x^3 + x^4 + x^8
         return modulo_m(product)
     
     def __truediv__(self, other):
-        # Polynomial long division
+        # Defer implementation of division to that in GenPoly
         quotient = self.asGenPoly() / other.asGenPoly()
         return toBytePolynomial(quotient)
     

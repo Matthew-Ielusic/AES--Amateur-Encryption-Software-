@@ -67,15 +67,48 @@ bytesExpected = [[0x0f, 0x60, 0x6f, 0x5e], [0xd6, 0x31, 0xc0, 0xb3], [0xda, 0x38
 bytesActual   = [[int(state[r][c]) for c in range(4)] for r in range(4)]
 assert bytesExpected == bytesActual, "MixColumns did not mix correctly.  Expected " + str(bytesExpected) + "; actual: " + str(bytesActual)
 
+print("Testing invSBOX")
+original = Galois.BytePolynomial.fromInt(0xab)
+boxed = RoundFunctions.sBox(original)
+unboxed = RoundFunctions.invSBox(boxed)
+assert original == unboxed, f'Expected {original}, got {unboxed}'
+
+original = Galois.BytePolynomial.fromInt(0x71)
+boxed = RoundFunctions.sBox(original)
+unboxed = RoundFunctions.invSBox(boxed)
+assert original == unboxed, f'Expected {original}, got {unboxed}'
+
+original = Galois.BytePolynomial.fromInt(0x00)
+boxed = RoundFunctions.sBox(original)
+unboxed = RoundFunctions.invSBox(boxed)
+assert original == unboxed, f'Expected {original}, got {unboxed}'
+
+original = Galois.BytePolynomial.fromInt(0xF3)
+boxed = RoundFunctions.sBox(original)
+unboxed = RoundFunctions.invSBox(boxed)
+assert original == unboxed, f'Expected {original}, got {unboxed}'
+
 print("Done.")
-print("Testing AddRoundKey")
-raise NotImplementedError
+print("Testing invShiftRows")
 input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
-state = RoundFunctions.State(input)
-roundKey = [IntPolynomial.IntPolynomial([Galois.BytePolynomial.fromInt(i*4) for i in range(4)])]*4
-RoundFunctions.AddRoundKey(state, roundKey)
+original = RoundFunctions.State(input)
+state	 = RoundFunctions.State(input)
+RoundFunctions.ShiftRows(state)
+RoundFunctions.invShiftRows(state)
 for r in range(4):
 	for c in range(4):
-		expected = None #???
-		assert int(state[r][c]) == expected, f'Expected {expected}, got {state[r][c]}'
-print("Done.")
+		assert state[r][c] == original[r][c], "The byte in row " + str(r) + " and column " + str(c) + " was not shifted correctly."
+
+print("Done")
+print("Testing invMixColumns")
+input = [Galois.BytePolynomial.fromInt(i) for i in range(16)]
+original = RoundFunctions.State(input)
+state	 = RoundFunctions.State(input)
+RoundFunctions.MixColumns(state)
+RoundFunctions.invMixColumns(state)
+for r in range(4):
+	for c in range(4):
+		assert state[r][c] == original[r][c], "The byte in row " + str(r) + " and column " + str(c) + " was not shifted correctly."
+print("Done")
+
+

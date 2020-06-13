@@ -21,26 +21,29 @@ class KeySchedule():
                 temp = SubWord(RotWord(temp)) + Rcon(int(i / C.Nk()))
             w.append(w[i - C.Nk()] + temp)
 
-        self._roundKeys = w
+        self.roundKeys = w
         self._roundNumber = 0
         self._roundSize = 4
+        self._roundDirection = 1
 
     def next(self):
-        output = self._roundKeys[self._roundNumber : self._roundNumber + self._roundSize]
-        self._roundNumber += self._roundSize
+        output = self.roundKeys[self._roundNumber : self._roundNumber + self._roundSize]
+        if not output:
+            raise IndexError("Tried to call next too many times")
+
+        self._roundNumber += self._roundDirection * self._roundSize
         return output
 
-    def __getitem__(self, key):
-        return self._roundKeys[key]
+    def hasNext(self):
+        if self._roundDirection is 1:
+            return (self._roundNumber + self._roundSize) <= len(self.roundKeys)
+        elif self._roundDirection is -1:
+            return self._roundNumber >= 0
+        else:
+            raise ValueError("Illegal value for self._roundDirection")
 
-#temp = w[i-1]
-# if (i mod Nk = 0)
-# temp = SubWord(RotWord(temp)) xor Rcon[i/Nk]
-# else if (Nk > 6 and i mod Nk = 4)
-# temp = SubWord(temp)
-# end if
-# w[i] = w[i-Nk] xor temp
-# i = i + 1
+    def __getitem__(self, key):
+        return self.roundKeys[key]
 
 
 def SubWord(intPoly):
@@ -56,3 +59,10 @@ def twoByte():
 
 def Rcon(i):
     return IntPolynomial([Galois.zeroByte(), Galois.zeroByte(), Galois.zeroByte(), twoByte() ** (i - 1)])
+
+
+def InverseKeySchedule(cipherKeyBytes):
+    schedule = KeySchedule(cipherKeyBytes)
+    schedule._roundNumber = C.Nr() * C.Nb()
+    schedule._roundDirection = -1
+    return schedule

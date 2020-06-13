@@ -6,6 +6,22 @@ sys.path.insert(0,parentdir)
 # </hack>
 
 from KeySchedule import KeySchedule
+from KeySchedule import InverseKeySchedule
+import Constants
+
+print("Testing InverseKeySchedule")
+key = range(16)
+sch = KeySchedule(key)
+inv = InverseKeySchedule(key)
+
+for i in range(Constants.Nr()):
+    j = (Constants.Nr() * Constants.Nb()) - (i*4)
+    nx = inv.next()
+    assert [int(k) for k in nx] == [int(k) for k in sch.roundKeys[j:j+4]], "Inverse keys schedule was wrong"
+
+print("Done")
+
+raise NotImplementedError
 # Appendex A.1
 key = 0x2b7e151628aed2a6abf7158809cf4f3c
 w0 = 0x2b7e1516 
@@ -29,3 +45,4 @@ assert int(schedule.roundKeys[24]) == w24, "Expected " + hex(int(w24)) + "; got 
 w43 = 0xb6630ca6
 assert int(schedule.roundKeys[43]) == w43, "Expected " + hex(int(w43)) + "; got " + hex(int(schedule.roundKeys[43]))
 print("Done")
+
