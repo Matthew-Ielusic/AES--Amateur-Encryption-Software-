@@ -6,8 +6,8 @@ sys.path.insert(0,parentdir)
 # </hack>
 
 
-import IntPolynomial as IP
-import Galois
+import Implementation.FiniteField.IntPolynomial as IP
+from Implementation.FiniteField import Galois
 import unittest
 
 class TestIntPoly(unittest.TestCase):

@@ -7,7 +7,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 # </hack>
 
-from Galois import BytePolynomial
+from Implementation.FiniteField.Galois import BytePolynomial
 import unittest
 
 class TestBytePoly(unittest.TestCase):

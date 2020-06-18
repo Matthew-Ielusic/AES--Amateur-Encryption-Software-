@@ -1,4 +1,4 @@
-import Galois
+from . import Galois
 
 class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(2^8)
     def __init__(self, coefficients):

@@ -5,9 +5,9 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 # </hack>
 
-import RoundFunctions
-import Galois
-import IntPolynomial
+from Implementation import RoundFunctions
+from Implementation.FiniteField import Galois
+from Implementation.FiniteField import IntPolynomial
 
 import unittest
 

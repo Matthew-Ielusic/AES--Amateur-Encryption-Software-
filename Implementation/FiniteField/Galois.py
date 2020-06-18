@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from GeneralizedPoly import GenPoly
-import GeneralizedPoly
+from . import GeneralizedPoly
+from .GeneralizedPoly import GenPoly
+
+
 # Section 3.2: "bytes are interpreted as finite field elements using a [degree-7] polynomial representation" (The finite field being GF(2^8), IE Galois finite field with 2**8=256 elements)
 
 class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an eight-bit byte
@@ -170,4 +172,3 @@ def lsDegree(coefficients):
         if coefficients[i]:
             return i
     return 0 #0 has degree 0.
-

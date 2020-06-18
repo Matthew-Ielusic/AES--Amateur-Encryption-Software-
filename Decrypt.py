@@ -1,7 +1,7 @@
-import RoundFunctions
-import KeySchedule
-import Constants as C
-import Galois
+from  Implementation import RoundFunctions
+from Implementation import KeySchedule
+from Implementation import Constants as C
+from Implementation.FiniteField import Galois
 import operator
 
 class AmateurDecrypt:

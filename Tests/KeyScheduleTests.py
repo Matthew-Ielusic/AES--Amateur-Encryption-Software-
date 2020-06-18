@@ -5,9 +5,9 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 # </hack>
 
-from KeySchedule import KeySchedule
-from KeySchedule import InverseKeySchedule
-import Constants
+from Implementation.KeySchedule import KeySchedule
+from Implementation.KeySchedule import InverseKeySchedule
+from Implementation import Constants
 import unittest
 
 class TestKeySchedule(unittest.TestCase):

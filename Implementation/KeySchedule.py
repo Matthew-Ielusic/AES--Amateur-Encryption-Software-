@@ -1,7 +1,7 @@
-from IntPolynomial import IntPolynomial
-import Galois
-import RoundFunctions
-import Constants as C
+from . FiniteField.IntPolynomial import IntPolynomial
+from . FiniteField import Galois
+from . import RoundFunctions
+from . import Constants as C
 
 class KeySchedule():
     # Amateur Encryption Software supports Nk = 4 (128 bits) only
@@ -62,7 +62,10 @@ def twoByte():
     return out
 
 def Rcon(i):
-    return IntPolynomial([Galois.zeroByte(), Galois.zeroByte(), Galois.zeroByte(), twoByte() ** (i - 1)])
+    return IntPolynomial([Galois.zeroByte(), 
+                          Galois.zeroByte(),
+                          Galois.zeroByte(), 
+                          twoByte() ** (i - 1)])
 
 
 def InverseKeySchedule(cipherKeyBytes):

@@ -8,7 +8,7 @@ sys.path.insert(0,parentdir)
 # </hack>
 
 
-from GeneralizedPoly import GenPoly
+from Implementation.FiniteField.GeneralizedPoly import GenPoly
 import unittest
 
 class TestGenPoly(unittest.TestCase):

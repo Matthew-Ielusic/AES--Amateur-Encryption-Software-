@@ -1,6 +1,5 @@
-import Galois
-import IntPolynomial
-import numpy
+from .FiniteField import Galois
+from .FiniteField import IntPolynomial
 import operator 
 import functools
 
@@ -69,7 +68,7 @@ def sBox(initial):
     # I could type out the entire 16x16 grid in Figure 7, but the maths are so elegant
     inverse = initial.inverse()
     product = gf2MatMul(sBoxMatrix(), inverse.coefficients) 
-    sum = numpy.bitwise_xor(product, sBoxVector()).tolist()
+    sum = [a ^ b for (a,b) in zip(product, sBoxVector())]
     return Galois.BytePolynomial(sum)
 
 def SubBytes(state):
@@ -108,7 +107,7 @@ def invSBox(initial):
     # Section 5.3.2: "the inverse of the affine transformation (5.1) followed by taking the multiplicative inverse in GF(2^8)."
     # That affine transformation is a matrix multiplication and then a vector addition
     # The inverse is the vector addition (XOR is its own inverse) followed by multiplication by the inverse of that matrix
-    sum = numpy.bitwise_xor(initial.coefficients, sBoxVector()).tolist()
+    sum = [a ^ b for (a,b) in zip(initial.coefficients, sBoxVector())]
     product = gf2MatMul(invSBoxMatrix(), sum)
     inverse = Galois.BytePolynomial(product).inverse()
     return inverse
