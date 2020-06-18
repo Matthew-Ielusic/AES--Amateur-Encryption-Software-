@@ -128,3 +128,6 @@ dmypy.json
 .vs/
 .vs/AES--Amateur-Encryption-Software-/v16/.suo
 .vs/slnx.sqlite
+
+*.sln
+*.vcproj
