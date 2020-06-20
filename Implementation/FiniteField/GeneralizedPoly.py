@@ -88,6 +88,7 @@ class GenPoly:
 
     def copy(self):
         return GenPoly(self.coefficients)
+    
 
 def xToThe(n):
     leftPad = [0] * n;

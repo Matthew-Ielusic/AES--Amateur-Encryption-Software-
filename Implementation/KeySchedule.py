@@ -10,14 +10,11 @@ class KeySchedule():
             raise ValueError("This implementation of AES supports 128-bit keys only")
         keyBytes = [Galois.BytePolynomial.fromInt(b) for b in cipherKeyBytes]
         # Reverse the endianness of each 4-byte word
-        # Sadly, keyBytes[3:-1:-1] = [] 
         w = [IntPolynomial(keyBytes[3::-1])] + [IntPolynomial(keyBytes[i+3:i-1:-1]) for i in (4, 8, 12)]
+        # Sadly, keyBytes[3:-1:-1] = [] 
         for i in range(C.Nk(), C.Nb() * (C.Nr() + 1)):
             temp = w[i - 1]
             if i % C.Nk() == 0:
-                rot = RotWord(temp)
-                sub = SubWord(rot)
-                rcon = sub + Rcon(int(i / C.Nk()))
                 temp = SubWord(RotWord(temp)) + Rcon(int(i / C.Nk()))
             w.append(w[i - C.Nk()] + temp)
 
@@ -49,6 +46,12 @@ class KeySchedule():
     def __getitem__(self, key):
         return self.roundKeys[key]
 
+def DecryptKeySchedule(cipherKeyBytes):
+    schedule = KeySchedule(cipherKeyBytes)
+    schedule._roundNumber = C.Nr() * C.Nb()
+    schedule._initialRoundNumber = schedule._roundNumber
+    schedule._roundDirection = -1
+    return schedule
 
 def SubWord(intPoly):
     return IntPolynomial([RoundFunctions.sBox(bytePoly) for bytePoly in intPoly.coefficients])
@@ -68,9 +71,4 @@ def Rcon(i):
                           twoByte() ** (i - 1)])
 
 
-def InverseKeySchedule(cipherKeyBytes):
-    schedule = KeySchedule(cipherKeyBytes)
-    schedule._roundNumber = C.Nr() * C.Nb()
-    schedule._initialRoundNumber = schedule._roundNumber
-    schedule._roundDirection = -1
-    return schedule
+

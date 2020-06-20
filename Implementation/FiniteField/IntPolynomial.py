@@ -78,9 +78,13 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
         else:
             return False
 
-    def __int__(self):
+    def __index__(self):
         ints = [int(c) for c in self.coefficients]
         return sum([ints[i] << (i*8) for i in range(4)])
+
+    def __int__(self):
+        return self.__index__()
+        # __int__ is defined for backwards compatibility.
 
     def __getitem__(self, key):
         return self.coefficients[key]
@@ -95,7 +99,7 @@ def a():
     one   = Galois.BytePolynomial([1, 0, 0, 0, 0, 0, 0, 0])
     return IntPolynomial([two, one, one, three])
 
-def aInv():
+def aInverse():
     e    = Galois.BytePolynomial([0, 1, 1, 1, 0, 0, 0, 0])
     nine = Galois.BytePolynomial([1, 0, 0, 1, 0, 0, 0, 0])
     d    = Galois.BytePolynomial([1, 0, 1, 1, 0, 0, 0, 0])

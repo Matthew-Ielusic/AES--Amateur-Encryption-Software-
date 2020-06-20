@@ -116,12 +116,16 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an ei
     def asGenPoly(self):
         return GenPoly(self.coefficients[:])
 
-    def __int__(self):
+    def __index__(self):
         output = 0
         for i in range(8):
             if self.coefficients[i]:
                 output += 2 ** i
         return output
+
+    def __int__(self):
+        return self.__index__()
+        # __int__ is defined for backwards compatibility.
 
 
 

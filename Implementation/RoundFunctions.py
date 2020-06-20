@@ -10,8 +10,8 @@ class State:
     #                   In the State array denoted by the symbol s, each individual byte has two indices, with its row number r [...] and its column number c."
     # Section 5.1 Pseudocode: The state array is taken by transforming a flat array of 16 bytes into a 4x4 array of bytes
     def __init__(self, input):
+        # Section 3.4, Figure 3: s[r,c] = in[4*r + c]
         self.data = [[input[row * 4 + column] for row in range(4)] for column in range(4)]
-     # Section 3.4, Figure 3: s[r,c] = in[4*r + c]
 
     @staticmethod
     def from4x4(input):
@@ -33,16 +33,25 @@ class State:
 
     def asList(self):
         # Column 0 is self.asList[0:4], column 1 is self.asList()[4:8], and so on
-        return [int(self.data[c][r]) for r in range(4) for c in range(4)]
+        return [int(self.data[r][c]) for c in range(4) for r in range(4)]
 
 
 def sBoxMatrix():
-    matrix = [ [int(((i + j) % 8) >= 3) for j in range(8)] for i in range(8)]
-    matrix.reverse()
-    return matrix
+    return [
+            [1,0,0,0,1,1,1,1],
+            [1,1,0,0,0,1,1,1],
+            [1,1,1,0,0,0,1,1],
+            [1,1,1,1,0,0,0,1],
+            [1,1,1,1,1,0,0,0],
+            [0,1,1,1,1,1,0,0],
+            [0,0,1,1,1,1,1,0],
+            [0,0,0,1,1,1,1,1]
+           ]
 
-def invSBoxMatrix():
-    # "I have nothing to offer but blood, toil, tears and sweat" (and manually-calculated inverses of 8x8 matrices under GF(2))
+def sBoxVector():
+    return [1,1,0,0,0,1,1,0]
+
+def inverseSBoxMatrix():
     return [
             [0,0,1,0,0,1,0,1],
             [1,0,0,1,0,0,1,0],
@@ -53,21 +62,22 @@ def invSBoxMatrix():
             [1,0,0,1,0,1,0,0],
             [0,1,0,0,1,0,1,0]
            ]
+    # "I have nothing to offer but blood, toil, tears and sweat" (and manually-calculated inverses of 8x8 matrices under GF(2))
 
-def sBoxVector():
-    return [1,1,0,0,0,1,1,0]
 
-def gf2MatMul(matrix, vector):
+
+
+def gf2MatrixTimesVector(matrix, vector):
     # Multiplies a matrix by a vector in GF(2)
     # (IE, we combine elements with XOR, not addition)
     elementwiseProduct = [[row[i] * vector[i] for i in range(8)] for row in matrix]
-    reduced =[ functools.reduce(operator.xor, row, 0) for row in elementwiseProduct ]
+    reduced = [ functools.reduce(operator.xor, row, 0) for row in elementwiseProduct ]
     return reduced
 
 def sBox(initial):
     # I could type out the entire 16x16 grid in Figure 7, but the maths are so elegant
     inverse = initial.inverse()
-    product = gf2MatMul(sBoxMatrix(), inverse.coefficients) 
+    product = gf2MatrixTimesVector(sBoxMatrix(), inverse.coefficients) 
     sum = [a ^ b for (a,b) in zip(product, sBoxVector())]
     return Galois.BytePolynomial(sum)
 
@@ -94,34 +104,33 @@ def MixColumns(state):
 def AddRoundKey(state, roundKeys):
     for r in range(4):
         for c in range(4):
-            state[r][c] = state[r][c] + roundKeys[c][3-r]
+            state[r][c] = state[r][c] + roundKeys[c][3-r] # Stupid big-endian/little-endian issues
 
             
-def invShiftRows(state):
+def inverseShiftRows(state):
     for r in range(1, 4): 
         old = state[r][:]
         for c in range(4):
             state[r][c] = old[(c - r) % 4]
 
-def invSBox(initial):
+def inverseSBox(initial):
     # Section 5.3.2: "the inverse of the affine transformation (5.1) followed by taking the multiplicative inverse in GF(2^8)."
     # That affine transformation is a matrix multiplication and then a vector addition
     # The inverse is the vector addition (XOR is its own inverse) followed by multiplication by the inverse of that matrix
     sum = [a ^ b for (a,b) in zip(initial.coefficients, sBoxVector())]
-    product = gf2MatMul(invSBoxMatrix(), sum)
+    product = gf2MatrixTimesVector(inverseSBoxMatrix(), sum)
     inverse = Galois.BytePolynomial(product).inverse()
     return inverse
 
-    return Galois.BytePolynomial(sum)
-def invSubBytes(state):
+def inverseSubBytes(state):
     for r in range(4):
         for c in range(4):
-            state[r][c] = invSBox(state[r][c])
+            state[r][c] = inverseSBox(state[r][c])
 
-def invMixColumns(state):
+def inverseMixColumns(state):
     columns     = [state.getColumn(i) for i in range(4)]
     polys       = [IntPolynomial.IntPolynomial(col) for col in columns]
-    products    = [poly * IntPolynomial.aInv() for poly in polys]
+    products    = [poly * IntPolynomial.aInverse() for poly in polys]
     newColumns  = [[poly.coefficients[i] for i in range(4)]  for poly in products]
     for i in range(4):
         state.setColumn(i, newColumns[i])

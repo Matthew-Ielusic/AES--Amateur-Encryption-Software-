@@ -78,29 +78,29 @@ class TestBackward(unittest.TestCase):
 	def test_inv_s_box(self):
 		original = Galois.BytePolynomial.fromInt(0xab)
 		boxed = RoundFunctions.sBox(original)
-		unboxed = RoundFunctions.invSBox(boxed)
+		unboxed = RoundFunctions.inverseSBox(boxed)
 		self.assertEqual(original, unboxed, f'Expected {original}, got {unboxed}')
 
 		original = Galois.BytePolynomial.fromInt(0x71)
 		boxed = RoundFunctions.sBox(original)
-		unboxed = RoundFunctions.invSBox(boxed)
+		unboxed = RoundFunctions.inverseSBox(boxed)
 		self.assertEqual(original, unboxed, f'Expected {original}, got {unboxed}')
 
 		original = Galois.BytePolynomial.fromInt(0x00)
 		boxed = RoundFunctions.sBox(original)
-		unboxed = RoundFunctions.invSBox(boxed)
+		unboxed = RoundFunctions.inverseSBox(boxed)
 		self.assertEqual(original, unboxed, f'Expected {original}, got {unboxed}')
 
 		original = Galois.BytePolynomial.fromInt(0xF3)
 		boxed = RoundFunctions.sBox(original)
-		unboxed = RoundFunctions.invSBox(boxed)
+		unboxed = RoundFunctions.inverseSBox(boxed)
 		self.assertEqual(original, unboxed, f'Expected {original}, got {unboxed}')
 
 	def test_inv_shift_rows(self):
 		original = RoundFunctions.State(self.input)
 		state	 = RoundFunctions.State(self.input)
 		RoundFunctions.ShiftRows(state)
-		RoundFunctions.invShiftRows(state)
+		RoundFunctions.inverseShiftRows(state)
 		for r in range(4):
 			for c in range(4):
 				self.assertEqual(original[r][c], state[r][c], "The byte in row " + str(r) + " and column " + str(c) + " was not shifted correctly.")
@@ -109,7 +109,7 @@ class TestBackward(unittest.TestCase):
 		original = RoundFunctions.State(self.input)
 		state	 = RoundFunctions.State(self.input)
 		RoundFunctions.MixColumns(state)
-		RoundFunctions.invMixColumns(state)
+		RoundFunctions.inverseMixColumns(state)
 		for r in range(4):
 			for c in range(4):
 				self.assertEqual(original[r][c], state[r][c], "The byte in row " + str(r) + " and column " + str(c) + " was not shifted correctly.")

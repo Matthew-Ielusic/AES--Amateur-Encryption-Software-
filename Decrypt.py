@@ -1,31 +1,31 @@
-from  Implementation import RoundFunctions
-from Implementation import KeySchedule
+from Implementation import RoundFunctions
+from Implementation.KeySchedule import DecryptKeySchedule
 from Implementation import Constants as C
-from Implementation.FiniteField import Galois
+from Implementation.FiniteField.Galois import BytePolynomial
 import operator
 
 class AmateurDecrypt:
     def __init__(self, keyByteList):
         if len(keyByteList) != C.Nk() * 4:
             raise ValueError("This class only supports 128-bit keys -- only flat arrays of 16 byte-like objects are allowed")
-        self.keySchedule = KeySchedule.InverseKeySchedule(keyByteList)
+        self.keySchedule = DecryptKeySchedule(keyByteList)
 
     def decryptBlock(self, inputByteList):
         if len(inputByteList) != C.Nb() * 4:
             raise ValueError("This method decrypts in ECB mode -- only flat arrays of 16 byte-like objects are allowed")
-
-        state = RoundFunctions.State([Galois.BytePolynomial.fromInt(b) for b in inputByteList])
+        inputAsPolynomials = [BytePolynomial.fromInt(b) for b in inputByteList]
+        state = RoundFunctions.State(inputAsPolynomials)
 
         RoundFunctions.AddRoundKey(state, self.keySchedule.next())
 
-        for round in range(C.Nr() - 1):
-            RoundFunctions.invShiftRows(state)
-            RoundFunctions.invSubBytes(state)
+        for _ in range(C.Nr() - 1):
+            RoundFunctions.inverseShiftRows(state)
+            RoundFunctions.inverseSubBytes(state)
             RoundFunctions.AddRoundKey(state, self.keySchedule.next())
-            RoundFunctions.invMixColumns(state)
+            RoundFunctions.inverseMixColumns(state)
     
-        RoundFunctions.invShiftRows(state)
-        RoundFunctions.invSubBytes(state)
+        RoundFunctions.inverseShiftRows(state)
+        RoundFunctions.inverseSubBytes(state)
         RoundFunctions.AddRoundKey(state, self.keySchedule.next())
 
         self.keySchedule.reset()
@@ -42,7 +42,7 @@ class AmateurDecrypt:
                 raise ValueError("The inputBlocks must be a list of lists of 16 byte-like objects")
             
             partialDecryption = self.decryptBlock(block)
-            fullDecryption = list(map(operator.xor, partialDecryption, previous))
+            fullDecryption = [part ^ prev for (part, prev) in zip(partialDecryption, previous)]
             previous = block
             
             plainText.append(fullDecryption)

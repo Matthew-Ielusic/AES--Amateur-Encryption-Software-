@@ -6,7 +6,7 @@ sys.path.insert(0,parentdir)
 # </hack>
 
 from Implementation.KeySchedule import KeySchedule
-from Implementation.KeySchedule import InverseKeySchedule
+from Implementation.KeySchedule import DecryptKeySchedule
 from Implementation import Constants
 import unittest
 
@@ -32,15 +32,15 @@ class TestKeySchedule(unittest.TestCase):
         k3 = int(schedule.roundKeys[3])
         self.assertEqual(w3, k3, "KeySchedule initialization failed")
         
-    def test_inverse_schedule(self):
+    def test_decrypt_schedule(self):
         key = range(16)
         sch = KeySchedule(key)
-        inv = InverseKeySchedule(key)
+        inv = DecryptKeySchedule(key)
 
         for i in range(Constants.Nr()):
             j = (Constants.Nr() * Constants.Nb()) - (i*4)
             nx = inv.next()
-            self.assertEqual([int(k) for k in sch.roundKeys[j:j+4]], [int(k) for k in nx], "Inverse keys schedule was wrong")
+            self.assertEqual([int(k) for k in sch.roundKeys[j:j+4]], [int(k) for k in nx], "Decrypt key schedule was wrong")
 
     def test_reset(self):
         key = range(0, 32, 2)
@@ -51,12 +51,12 @@ class TestKeySchedule(unittest.TestCase):
         sch.reset()
         self.assertEqual(initial, sch.next(), "KeySchedule's reset failed")
 
-        inv = InverseKeySchedule(key)
+        inv = DecryptKeySchedule(key)
         initial = inv.next()
         while inv.hasNext():
             inv.next()
         inv.reset()
-        self.assertEqual(initial, inv.next(), "InverseKeySchedule's reset failed")
+        self.assertEqual(initial, inv.next(), "DecryptKeySchedule's reset failed")
 
 if __name__ == '__main__':
     try:
