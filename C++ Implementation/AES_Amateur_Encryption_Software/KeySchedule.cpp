@@ -5,13 +5,16 @@
 #include "Constants.h"
 #include <stdexcept>
 
-uint32_t word(const uint8_t* current);
+uint32_t word(const std::vector<uint8_t> data, int index);
 
-KeySchedule::KeySchedule(const uint8_t* key) : index(0), direction(1)
+KeySchedule::KeySchedule(const std::vector<uint8_t>& key) : index(0), direction(1)
 {
+	if (key.size() != Nk * Nb) {
+		throw std::invalid_argument("Only 128-bit keys are supported");
+	}
 	
-	for (int i = 0; i < Nk * Nb; i += 4) {
-		keys.push_back(word(key + i));
+	for (int index = 0; index < Nk * Nb; index += 4) {
+		keys.push_back(word(key, index));
 	}
 
 	uint32_t current;
@@ -37,7 +40,7 @@ uint32_t KeySchedule::at(int index) const
 	return keys.at(index);
 }
 
-KeySchedule KeySchedule::InverseSchedule(const uint8_t* key)
+KeySchedule KeySchedule::InverseSchedule(const std::vector<uint8_t>& key)
 {
 	KeySchedule output(key);
 	output.index = (Nb * (Nr + 1)) - 1;
@@ -45,11 +48,11 @@ KeySchedule KeySchedule::InverseSchedule(const uint8_t* key)
 	return output;
 }
 
-uint32_t word(const uint8_t* current) {
-	uint32_t msb         = static_cast<uint32_t>(*current++) << 24;
-	uint32_t secondMost  = static_cast<uint32_t>(*current++) << 16;
-	uint32_t secondLeast = static_cast<uint32_t>(*current++) << 8;
-	uint32_t lsb         = static_cast<uint32_t>(*current);
+uint32_t word(const std::vector<uint8_t> data, int index) {
+	uint32_t msb         = static_cast<uint32_t>(data.at(index)) << 24; index++;
+	uint32_t secondMost  = static_cast<uint32_t>(data.at(index)) << 16; index++;
+	uint32_t secondLeast = static_cast<uint32_t>(data.at(index)) << 8;  index++;
+	uint32_t lsb         = static_cast<uint32_t>(data.at(index));
 	return msb | secondMost | secondLeast | lsb;
 }
 
@@ -62,9 +65,9 @@ uint32_t transform(uint32_t value, int i) {
 	for (int i = 0; i < 4; ++i) {
 		bytes[i] = FiniteField::sBox(bytes[i]);
 	}
-	uint8_t rotated[4] = { bytes[1], bytes[2], bytes[3], bytes[0] };
+	std::vector<uint8_t> rotated = { bytes[1], bytes[2], bytes[3], bytes[0] };
 
-	return word(rotated) ^ Rcon(i / 4);
+	return word(rotated, 0) ^ Rcon(i / 4);
 }
 
 uint32_t Rcon(int i) {

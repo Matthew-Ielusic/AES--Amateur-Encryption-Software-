@@ -3,7 +3,7 @@
 #include "RoundFunctions.h"
 #include <stdexcept>
 
-RoundFunctions::State::State(const uint8_t* block)
+RoundFunctions::State::State(const std::vector<uint8_t>& block)
 {
     for (int r = 0; r < 4; ++r) {
         for (int c = 0; c < 4; ++c) {
@@ -11,6 +11,7 @@ RoundFunctions::State::State(const uint8_t* block)
         }
     }
 }
+
 
 void RoundFunctions::State::SubBytes() {
     int r, c;
@@ -91,7 +92,13 @@ void RoundFunctions::State::MixColumns()
 
 uint8_t& RoundFunctions::State::at(int row, int column)
 {
-    return values[row][column];
+    if (0 <= row && row <= 3) {
+        if (0 <= column && column <= 3) {
+            return values[row][column];
+        }
+    }
+    
+    throw std::out_of_range("");
 }
 
 

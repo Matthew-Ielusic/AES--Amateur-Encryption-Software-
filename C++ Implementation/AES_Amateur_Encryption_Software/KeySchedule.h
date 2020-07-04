@@ -4,8 +4,8 @@
 class KeySchedule
 {
 public:
-	KeySchedule(const uint8_t* key);
-	static KeySchedule InverseSchedule(const uint8_t* key);
+	KeySchedule(const std::vector<uint8_t>& key);
+	static KeySchedule InverseSchedule(const std::vector<uint8_t>& key);
 
 	uint32_t next();
 	uint32_t at(int index) const;

@@ -4,7 +4,9 @@
 namespace RoundFunctions {
 	class State {
 	public:
-		State(const uint8_t* block);
+		State(const std::vector<uint8_t>& block);
+
+		void AddRoundKey(uint32_t roundKey);
 		void SubBytes();
 		void ShiftRows();
 		void MixColumns();
