@@ -29,7 +29,7 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
             # x^4 + 1"
         
         # Calculate the product
-        product = [Galois.zeroByte() for i in range(7)]
+        product = [Galois.zeroByte()] * 7
         for i in range(4):
             for j in range(4):
                 product[i + j] += self.coefficients[i] * other.coefficients[j]
@@ -37,16 +37,6 @@ class IntPolynomial: # Section 4.3: Degree-4 polynomial with coefficients in GF(
         # Reduce modulo x^4 + 1
         modulo_x4(product)
         return IntPolynomial(product[:4])
-
-    def modularProduct(self, other):
-        # Section 4.3: "The modular product of a(x) and b(x) [...] is given by the four-term polynomial d(x) [definition omitted]"
-        d = [Galois.zeroByte() for i in range(4)]
-        for i in range(4): # Index into self.coefficients
-            for j in range(4): # Index into other.coefficients
-                index = (i + j) % 4
-                d[index] += self.coefficients[i] * other.coefficients[j]
-        return IntPolynomial(d)
-
         
     def __str__(self):
         # Convienent string representation not described in the specification

@@ -82,9 +82,9 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an ei
 
         # EEA based off of wikipedia pseudocode
         old_s = GenPoly([1]) # IE, old_s = 1
-        s = GenPoly([0]) #IE, s = 0
+        s     = GenPoly([0]) #IE, s = 0
         old_t = GenPoly([0]) #IE, old_t = 0
-        t = GenPoly([1]) # IE, t = 1
+        t     = GenPoly([1]) # IE, t = 1
         old_r = m()
         r = GenPoly(self.coefficients)
         while any(r.coefficients):
@@ -98,11 +98,6 @@ class BytePolynomial: # Represents specifically a polynomial in GF(2^8) OR an ei
         # So by section 4.2, the inverse of self is old_t % m()
        
         return modulo_m(old_t)
-
-        # Just in case...
-        #print("Bézout coefficients:", old_s, old_t, sep=',')
-        #print("greatest common divisor:", old_r)
-        #print("quotients by the gcd:", t, s, sep=',')
 
     def __eq__(self, other):
         return self.coefficients == other.coefficients

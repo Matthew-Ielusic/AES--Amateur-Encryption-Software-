@@ -28,6 +28,16 @@ class TestIntPoly(unittest.TestCase):
         
         self.assertEqual(expected, x+y, "IntPolynomial's __add__ failed")
 
+    def test_mult(self):
+        x        = IP.IntPolynomial([Galois.BytePolynomial.fromInt(0x52),
+                                   Galois.BytePolynomial.fromInt(0xa4),
+                                   Galois.BytePolynomial.fromInt(0xc8),
+                                   Galois.BytePolynomial.fromInt(0x94)])
+        expected = IP.IntPolynomial([Galois.BytePolynomial.fromInt(0x0f),
+                                   Galois.BytePolynomial.fromInt(0xd6),
+                                   Galois.BytePolynomial.fromInt(0xda),
+                                   Galois.BytePolynomial.fromInt(0xa9)])
+        self.assertEqual(expected, x * IP.a(), "IntPolynomial's __mult__ failed")
 
 
 if __name__ == '__main__':

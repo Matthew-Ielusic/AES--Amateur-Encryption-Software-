@@ -38,7 +38,6 @@ class GenPoly:
         return self + other
     
     def __mul__(self, other):
-        # Just honking multiply the polynomials the hard way, and let EEA handle the fallout
         productLen = len(self) + len(other)
         product = [0] * productLen
         for i in range(len(self.coefficients)): # Index into self.coefficients
@@ -46,14 +45,14 @@ class GenPoly:
                 term = self.coefficients[i] * other.coefficients[j]
                 index = i + j
                 product[index] ^= term # "add" (xor) terms of the same degree
-        # Problem: one of the coefficient arrays may have a most-significant-coefficient of zero
-        # Solution: trim product of trailing zeros via array slices & degree()
-        return GenPoly(product[:lsDegree(product) + 1])
+        output = GenPoly(product)
+        output.trim()
+        return output
     
     def __truediv__(self, other):
-        # Polynomial long division
         if not any(other.coefficients):
             raise ZeroDivisionError # No coefficient of other is nonzero means other is zero
+        # Polynomial long division
         quotient = GenPoly([0] * len(self.coefficients))
         remainder = GenPoly(self.coefficients)
         degreeDifference = remainder.degree() - other.degree()
