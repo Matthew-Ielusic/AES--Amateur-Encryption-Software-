@@ -151,7 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AmateurEncrypt.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KeySchedule.h" />
@@ -160,7 +159,6 @@
     <ClInclude Include="WordPolynomial.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AmateurEncrypt.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="KeySchedule.cpp" />
     <ClCompile Include="pch.cpp">
