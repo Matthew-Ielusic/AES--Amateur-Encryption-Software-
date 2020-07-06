@@ -1,39 +1,56 @@
 #include "pch.h"
 #include "AmateurEncrypt.h"
 #include "RoundFunctions.h"
+#include "Constants.h"
 #include <stdexcept>
 
 AmateurEncrypt::AmateurEncrypt(const std::vector<uint8_t>& key) : schedule(key) { }
 
-std::vector<uint8_t> AmateurEncrypt::encrypt(const std::vector<uint8_t>& block)
+std::vector<uint8_t> AmateurEncrypt::encryptBlock(const std::vector<uint8_t>& block)
 {
     if (block.size() != 16) {
         throw std::invalid_argument("Input blocks must be 16 bytes long");
     }
 
     RoundFunctions::State state(block);
-    
 
+    state.AddRoundKey(schedule);
 
+    for (int i = 0; i < Nr - 1; ++i) {
+        state.SubBytes();
+        state.ShiftRows();
+        state.MixColumns();
+        state.AddRoundKey(schedule);
+    }
 
-   /* def encryptBlock(self, inputByteList) :
-        if len(inputByteList) != C.Nb() * 4 :
-            raise ValueError("This method encrypts in ECB mode -- only flat arrays of 16 byte-like objects are allowed")
-            inputAsPolynomials = [BytePolynomial.fromInt(b) for b in inputByteList]
-            state = RoundFunctions.State(inputAsPolynomials)
+    state.SubBytes();
+    state.ShiftRows();
+    state.AddRoundKey(schedule);
 
-            RoundFunctions.AddRoundKey(state, self.keySchedule.next())
+    schedule.reset();
 
-            for _ in range(C.Nr() - 1) :
-                RoundFunctions.SubBytes(state)
-                RoundFunctions.ShiftRows(state)
-                RoundFunctions.MixColumns(state)
-                RoundFunctions.AddRoundKey(state, self.keySchedule.next())
+    return state.toVector();
+}
 
-                RoundFunctions.SubBytes(state)
-                RoundFunctions.ShiftRows(state)
-                RoundFunctions.AddRoundKey(state, self.keySchedule.next())
+std::vector<std::vector<uint8_t>> AmateurEncrypt::cbc(const std::vector<std::vector<uint8_t>> data, const std::vector<uint8_t>& iv)
+{
+    if (iv.size() != 16) {
+        throw std::invalid_argument("The length of the IV must be 16 bytes");
+    }
 
-                self.keySchedule.reset()
-                return state.asList()*/
+    std::vector<std::vector<uint8_t>> output;
+    const std::vector<uint8_t>* previous = &iv;
+    for (auto block : data) { // Deliberate vector copy!
+        pairwiseXOR(block, previous);
+        output.push_back(encryptBlock(block));
+        previous = &output.back();
+    }
+    return output;
+}
+
+void pairwiseXOR(std::vector<uint8_t>& target, const std::vector<uint8_t>* key)
+{
+    for (int i = 0; i < 16; ++i) {
+        target[i] ^= (*key)[i];
+    }
 }

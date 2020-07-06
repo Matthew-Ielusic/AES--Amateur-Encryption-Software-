@@ -35,6 +35,20 @@ uint32_t KeySchedule::next()
 	return output;
 }
 
+void KeySchedule::reset()
+{
+	switch (direction) {
+	case 1:
+		index = 0;
+		return;
+	case -1:
+		index = keys.size() - 1;
+		return;
+	default:
+		throw std::logic_error("`direction` had an illegal value");
+	}
+}
+
 uint32_t KeySchedule::at(int index) const
 {
 	return keys.at(index);

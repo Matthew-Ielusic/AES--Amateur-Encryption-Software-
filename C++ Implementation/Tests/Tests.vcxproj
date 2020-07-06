@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)AES_Amateur_Encryption_Software\$(IntermediateOutputPath)KeySchedule.obj;$(SolutionDir)AES_Amateur_Encryption_Software\$(IntermediateOutputPath)RoundFunctions.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)AES_Amateur_Encryption_Software\$(IntermediateOutputPath)KeySchedule.obj;$(SolutionDir)AES_Amateur_Encryption_Software\$(IntermediateOutputPath)RoundFunctions.obj;$(SolutionDir)AES_Amateur_Encryption_Software\$(IntermediateOutputPath)AmateurEncrypt.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ExportTests.cpp" />
     <ClCompile Include="KeyScheduleTests.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

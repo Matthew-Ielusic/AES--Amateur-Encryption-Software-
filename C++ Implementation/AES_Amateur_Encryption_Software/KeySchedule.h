@@ -8,6 +8,7 @@ public:
 	static KeySchedule InverseSchedule(const std::vector<uint8_t>& key);
 
 	uint32_t next();
+	void reset();
 	uint32_t at(int index) const;
 
 private:

@@ -12,6 +12,8 @@ namespace RoundFunctions {
 		void ShiftRows();
 		void MixColumns();
 		uint8_t& at(int row, int column);
+
+		std::vector<uint8_t> toVector() const;
 	private:
 		uint8_t values[4][4];
 		// Access values using values[rowIndex][columnIndex]
