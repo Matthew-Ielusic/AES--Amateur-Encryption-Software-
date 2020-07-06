@@ -18,10 +18,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\0_MyActualDocuments\Programming\Amateur_Encryption_Software_Cpp\Tests\RoundFunctionTests.cpp">
+    <ClCompile Include="KeyScheduleTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\0_MyActualDocuments\Programming\Amateur_Encryption_Software_Cpp\Tests\KeyScheduleTests.cpp">
+    <ClCompile Include="RoundFunctionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

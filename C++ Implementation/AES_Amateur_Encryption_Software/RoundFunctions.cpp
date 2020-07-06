@@ -7,11 +7,25 @@ RoundFunctions::State::State(const std::vector<uint8_t>& block)
 {
     for (int r = 0; r < 4; ++r) {
         for (int c = 0; c < 4; ++c) {
-            values[r][c] = block[c + (4 * r)];
+            values[r][c] = block[r + (c * 4)];
         }
     }
 }
 
+
+void RoundFunctions::State::AddRoundKey(KeySchedule& schedule)
+{
+    for (int c = 0; c < 4; ++c) {
+        uint32_t key = schedule.next();
+
+        for (int r = 0; r < 4; ++r) {
+            int shift = (3 - r) * 8;
+            uint32_t masked = key & (0xff << shift);
+            uint8_t keyByte = static_cast<uint8_t>(masked >> shift);
+            values[r][c] ^= keyByte;
+        }
+    }
+}
 
 void RoundFunctions::State::SubBytes() {
     int r, c;

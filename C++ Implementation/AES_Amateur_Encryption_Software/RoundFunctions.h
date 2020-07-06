@@ -1,12 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include "KeySchedule.h"
 namespace RoundFunctions {
 	class State {
 	public:
 		State(const std::vector<uint8_t>& block);
 
-		void AddRoundKey(uint32_t roundKey);
+		void AddRoundKey(KeySchedule& schedule);
 		void SubBytes();
 		void ShiftRows();
 		void MixColumns();
