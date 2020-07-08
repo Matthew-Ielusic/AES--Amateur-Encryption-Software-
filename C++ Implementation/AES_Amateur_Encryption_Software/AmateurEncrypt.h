@@ -16,6 +16,8 @@ private:
 	KeySchedule schedule;
 };
 
-void pairwiseXOR(std::vector<uint8_t>& target, const std::vector<uint8_t>* key);
+namespace CipherBlockChaining {
+	void pairwiseXOR(std::vector<uint8_t>& target, const std::vector<uint8_t>* key);
+}
 
 

@@ -28,6 +28,10 @@ KeySchedule::KeySchedule(const std::vector<uint8_t>& key) : index(0), direction(
 	}
 }
 
+KeySchedule::KeySchedule()
+{
+}
+
 uint32_t KeySchedule::next()
 {
 	uint32_t output = keys.at(index);

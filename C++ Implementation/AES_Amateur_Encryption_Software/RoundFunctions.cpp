@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "RoundFunctions.h"
+#include "ColumnMixer.h"
 #include <stdexcept>
 
 RoundFunctions::State::State(const std::vector<uint8_t>& block)
@@ -51,26 +52,7 @@ void RoundFunctions::State::ShiftRows()
     }
 }
 
-static uint8_t times02(uint8_t value) {
-    static_assert(sizeof(int) > 1, "sizeof(int) == 1 ??");
-    int result = value << 1;
-    if (result < 256) {
-        return result;
-    }
-    else {
-        return result ^ 0x1b;
-    }
-}
 
-static uint8_t times03(uint8_t value) {
-    int result = (value << 1) ^ value;
-    if (result < 256) {
-        return result;
-    }
-    else {
-        return result ^ 0x1b;
-    }
-}
 
 void RoundFunctions::State::MixColumns()
 {
@@ -79,8 +61,8 @@ void RoundFunctions::State::MixColumns()
     uint8_t newValues[4];
     for (c = 0; c < 4; ++c) {
         for (r = 0; r < 4; ++r) {
-            newValues[r] = times02(values[r][c]) ^
-                           times03(values[(r + 1) % 4][c]) ^
+            newValues[r] = ColumnMixer::times02(values[r][c]) ^
+                           ColumnMixer::times03(values[(r + 1) % 4][c]) ^
                            values[(r + 2) % 4][c] ^
                            values[(r + 3) % 4][c];
         }
@@ -90,18 +72,6 @@ void RoundFunctions::State::MixColumns()
     }
 
     return;
-    for (r = 0; r < 4; ++r) {
-        for (c = 0; c < 4; ++c) {
-            uint8_t qq = times02(values[r][c]) ^
-                         times03(values[r][(c + 1) % 4]) ^
-                         values[r][(c + 2) % 4] ^
-                         values[r][(c + 3) % 4];
-            values[r][c] = times02(values[r][c]) ^ 
-                           times03(values[(r + 1) % 4][c]) ^
-                           values[(r + 2) % 4][c] ^ 
-                           values[(r + 3) % 4][c];
-        }
-    }
 }
 
 uint8_t& RoundFunctions::State::at(int row, int column)
@@ -165,4 +135,52 @@ bool RoundFunctions::operator==(const RoundFunctions::State& left, const RoundFu
         }
     }
     return true;
+}
+
+void RoundFunctions::State::InvSubBytes()
+{
+    int r, c;
+    for (r = 0; r < 4; ++r) {
+        for (c = 0; c < 4; ++c) {
+            values[r][c] = FiniteField::invSBox(values[r][c]);
+        }
+    }
+}
+
+void RoundFunctions::State::InvShiftRows()
+{
+    //for r in range(1, 4) :
+    //    old = state[r][:]
+    //    for c in range(4) :
+    //        state[r][c] = old[(c - r) % 4]
+    for (int r = 1; r < 4; ++r) {
+        // Deploy blazing-fast (?) memcpy
+        uint8_t* row = values[r];
+        uint8_t old[4];
+        memcpy(old, row, 4);
+
+        int offset = 4 - r;
+        memcpy(row, old + offset, r);
+        memcpy(row + r, old, offset);
+    }
+}
+
+void RoundFunctions::State::InvMixColumns()
+{
+    int r, c;
+
+    uint8_t newValues[4];
+    for (c = 0; c < 4; ++c) {
+        for (r = 0; r < 4; ++r) {
+            newValues[r] =  ColumnMixer::times0e(values[r][c]) ^
+                            ColumnMixer::times0b(values[(r + 1) % 4][c]) ^
+                            ColumnMixer::times0d(values[(r + 2) % 4][c]) ^
+                            ColumnMixer::times09(values[(r + 3) % 4][c]);
+        }
+        for (r = 0; r < 4; ++r) {
+            values[r][c] = newValues[r];
+        }
+    }
+
+    return;
 }

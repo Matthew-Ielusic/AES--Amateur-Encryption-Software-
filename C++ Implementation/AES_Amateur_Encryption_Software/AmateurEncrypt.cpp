@@ -41,14 +41,14 @@ std::vector<std::vector<uint8_t>> AmateurEncrypt::cbc(const std::vector<std::vec
     std::vector<std::vector<uint8_t>> output;
     const std::vector<uint8_t>* previous = &iv;
     for (auto block : data) { // Deliberate vector copy!
-        pairwiseXOR(block, previous);
+        CipherBlockChaining::pairwiseXOR(block, previous);
         output.push_back(encryptBlock(block));
         previous = &output.back();
     }
     return output;
 }
 
-void pairwiseXOR(std::vector<uint8_t>& target, const std::vector<uint8_t>* key)
+void CipherBlockChaining::pairwiseXOR(std::vector<uint8_t>& target, const std::vector<uint8_t>* key)
 {
     for (int i = 0; i < 16; ++i) {
         target[i] ^= (*key)[i];

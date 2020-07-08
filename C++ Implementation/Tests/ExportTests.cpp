@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "AmateurEncrypt.h"
+#include "AmateurDecrypt.h"
 
 
 
@@ -53,6 +54,27 @@ namespace Tests
 				for (int j = 0; j < 16; ++j) {
 					Assert::AreEqual(exp.at(j), act.at(j));
 				}
+			}
+		}
+
+		TEST_METHOD(TestDecryptBlock) 
+		{
+			std::vector<uint8_t> key;
+			std::vector<uint8_t> block;
+			for (int i = 0; i < 16; ++i)
+			{
+				key.push_back(i * 37 + (255 - i));
+				block.push_back((255 - i) * (16 - i));
+			}
+
+			AmateurEncrypt encrypt(key);
+			AmateurDecrypt decrypt(key);
+
+			std::vector<uint8_t> roundTrip = decrypt.decryptBlock(encrypt.encryptBlock(block));
+			Assert::AreEqual(block.size(), roundTrip.size());
+			for (int i = 0; i < 16; ++i)
+			{
+				Assert::AreEqual(block.at(i), roundTrip.at(i));
 			}
 		}
 	};

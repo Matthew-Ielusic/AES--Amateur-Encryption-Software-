@@ -79,5 +79,46 @@ namespace Tests
 				}
 			}
 		}
+
+		TEST_METHOD(TestInvSBox) {
+			for (uint8_t i = 0; i < 0xab; i += 31) {
+				uint8_t roundTrip = FiniteField::invSBox(FiniteField::sBox(i));
+				Assert::AreEqual(i, roundTrip);
+			}
+		}
+
+		TEST_METHOD(TestInvShiftRow) {
+			std::vector<uint8_t> data(16);
+			for (int i = 0; i < 16; ++i)
+				data[i] = i;
+
+			RoundFunctions::State original(data);
+			RoundFunctions::State roundTrip(data);
+
+			roundTrip.ShiftRows();
+			roundTrip.InvShiftRows();
+
+			for (int r = 0; r < 4; ++r) {
+				for (int c = 0; c < 4; ++c) {
+					Assert::AreEqual(original.at(r, c), roundTrip.at(r, c));
+				}
+			}
+		}
+
+		TEST_METHOD(TestInvMixColumns) {
+			std::vector<uint8_t> block = { 0x87, 0x6e, 0x46, 0xa6, 0xf2, 0x4c, 0xe7, 0x8c, 0x4d, 0x90, 0x4a, 0xd8, 0x97, 0xec, 0xc3, 0x95 };
+
+			RoundFunctions::State original(block);
+			RoundFunctions::State roundTrip(block);
+
+			roundTrip.MixColumns();
+			roundTrip.InvMixColumns();
+
+			for (int r = 0; r < 4; ++r) {
+				for (int c = 0; c < 4; ++c) {
+					Assert::AreEqual(original.at(r, c), roundTrip.at(r, c));
+				}
+			}
+		}
 	};
 }

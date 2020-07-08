@@ -8,10 +8,15 @@ namespace RoundFunctions {
 		State(const std::vector<uint8_t>& block);
 
 		void AddRoundKey(KeySchedule& schedule);
+		uint8_t& at(int row, int column);
+
 		void SubBytes();
 		void ShiftRows();
 		void MixColumns();
-		uint8_t& at(int row, int column);
+
+		void InvSubBytes();
+		void InvShiftRows();
+		void InvMixColumns();
 
 		std::vector<uint8_t> toVector() const;
 	private:
