@@ -32,4 +32,23 @@ std::vector<uint8_t> AmateurDecrypt::decryptBlock(const std::vector<uint8_t>& bl
     schedule.reset();
     return state.toVector();
 }
+
+std::vector<std::vector<uint8_t>> AmateurDecrypt::cbc(const std::vector<std::vector<uint8_t>> data, const std::vector<uint8_t>& iv)
+{
+    if (iv.size() != 16) {
+        throw std::invalid_argument("The length of the IV must be 16 bytes");
+    }
+
+    std::vector<std::vector<uint8_t>> output;
+    const std::vector<uint8_t>* previous = &iv;
+
+    for (const auto& block : data) { // No array copy
+        std::vector<uint8_t> decryption = decryptBlock(block);
+        CipherBlockChaining::pairwiseXOR(decryption, previous);
+        output.push_back(decryption);
+        previous = &block;
+    }
+
+    return output;
+}
    
