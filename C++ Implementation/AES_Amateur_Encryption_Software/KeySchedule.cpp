@@ -1,13 +1,16 @@
 #include "pch.h"
 
+#include "Constants.h"
 #include "KeySchedule.h"
 #include "RoundFunctions.h"
-#include "Constants.h"
 #include <stdexcept>
 
+
+uint32_t Rcon(int i);
+uint32_t transform(uint32_t, int);
 uint32_t word(const std::vector<uint8_t> data, int index);
 
-KeySchedule::KeySchedule(const std::vector<uint8_t>& key) : index(0), direction(1)
+KeySchedule::KeySchedule(const std::vector<uint8_t>& key) : index(0)
 {
 	if (key.size() != Nk * Nb) {
 		throw std::invalid_argument("Only 128-bit keys are supported");
@@ -28,42 +31,21 @@ KeySchedule::KeySchedule(const std::vector<uint8_t>& key) : index(0), direction(
 	}
 }
 
-KeySchedule::KeySchedule()
-{
-}
-
 uint32_t KeySchedule::next()
 {
 	uint32_t output = keys.at(index);
-	index += direction;
+	index++;
 	return output;
 }
 
 void KeySchedule::reset()
 {
-	switch (direction) {
-	case 1:
-		index = 0;
-		return;
-	case -1:
-		index = keys.size() - 1;
-		return;
-	default:
-		throw std::logic_error("`direction` had an illegal value");
-	}
+	index = 0;
 }
 
 uint32_t KeySchedule::at(int index) const
 {
 	return keys.at(index);
-}
-
-KeySchedule KeySchedule::InverseSchedule(const std::vector<uint8_t>& key)
-{
-	KeySchedule output(key);
-	output.index = (Nb * (Nr + 1)) - 1;
-	output.direction = -1;
-	return output;
 }
 
 uint32_t word(const std::vector<uint8_t> data, int index) {
@@ -73,9 +55,6 @@ uint32_t word(const std::vector<uint8_t> data, int index) {
 	uint32_t lsb         = static_cast<uint32_t>(data.at(index));
 	return msb | secondMost | secondLeast | lsb;
 }
-
-
-
 
 uint32_t transform(uint32_t value, int i) {
 	// result = SubWord(RotWord(temp)) xor Rcon[i / Nk]

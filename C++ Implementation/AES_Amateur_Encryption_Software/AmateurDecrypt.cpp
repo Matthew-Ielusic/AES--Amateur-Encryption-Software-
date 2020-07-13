@@ -6,14 +6,10 @@
 
 #include <stdexcept>
 
-AmateurDecrypt::AmateurDecrypt(const std::vector<uint8_t>& key)
-{
-    schedule = KeySchedule::InverseSchedule(key);
-}
+AmateurDecrypt::AmateurDecrypt(const std::vector<uint8_t>& key) : schedule(key) { }
 
 std::vector<uint8_t> AmateurDecrypt::decryptBlock(const std::vector<uint8_t>& block)
 {
-    throw "Not Implemented";
     if (block.size() != 16) {
         throw std::invalid_argument("Input blocks must be 16 bytes long");
     }

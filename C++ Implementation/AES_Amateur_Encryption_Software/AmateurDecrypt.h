@@ -1,5 +1,5 @@
 #pragma once
-#include "KeySchedule.h"
+#include "InverseKeySchedule.h"
 #include "AmateurEncrypt.h"
 #include <cstdint>
 #include <vector>
@@ -13,6 +13,6 @@ public:
 	std::vector<std::vector<uint8_t>> cbc(const std::vector<std::vector<uint8_t>> data, const std::vector<uint8_t>& iv);
 
 private:
-	KeySchedule schedule;
+	InverseKeySchedule schedule;
 };
 
