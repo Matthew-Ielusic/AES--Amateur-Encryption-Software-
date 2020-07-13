@@ -29,7 +29,7 @@ uint8_t ColumnMixer::times03(uint8_t value) {
 uint8_t ColumnMixer::times09(uint8_t value)
 {
     int result = (value << 3) ^ value;
-    for (int shift = 3; result > 256; --shift) {
+    for (int shift = 3; result >= 256; --shift) {
         //if (result > (m << shift))
         if (result & (1 << (shift + mLen)))
             result ^= m << shift;
@@ -40,7 +40,7 @@ uint8_t ColumnMixer::times09(uint8_t value)
 uint8_t ColumnMixer::times0b(uint8_t value)
 {
     int result = (value << 3) ^ (value << 1) ^ value;
-    for (int shift = 3; result > 256; --shift) {
+    for (int shift = 3; result >= 256; --shift) {
         if (result & (1 << (shift + mLen)))
             result ^= m << shift;
     }
@@ -50,7 +50,7 @@ uint8_t ColumnMixer::times0b(uint8_t value)
 uint8_t ColumnMixer::times0d(uint8_t value)
 {
     int result = (value << 3) ^ (value << 2) ^ value;
-    for (int shift = 3; result > 256; --shift) {
+    for (int shift = 3; result >= 256; --shift) {
         if (result & (1 << (shift + mLen)))
             result ^= m << shift;
     }
@@ -60,7 +60,7 @@ uint8_t ColumnMixer::times0d(uint8_t value)
 uint8_t ColumnMixer::times0e(uint8_t value)
 {
     int result = (value << 3) ^ (value << 2) ^ (value << 1);
-    for (int shift = 3; result > 256; --shift) {
+    for (int shift = 3; result >= 256; --shift) {
         if (result & (1 << (shift + mLen)))
             result ^= m << shift;
     }

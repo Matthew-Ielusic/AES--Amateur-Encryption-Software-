@@ -74,5 +74,29 @@ namespace Tests
 				Assert::AreEqual(block.at(i), roundTrip.at(i));
 			}
 		}
+
+		TEST_METHOD(TestDecryptCBC) 
+		{
+			std::vector<uint8_t> allZeros(16, 0);
+			AmateurEncrypt encrypt(allZeros);
+			AmateurDecrypt decrypt(allZeros);
+
+			auto a = encrypt.encryptBlock(allZeros);
+			auto b = decrypt.decryptBlock(a);
+
+			std::vector<std::vector<uint8_t>> input = { allZeros, allZeros, allZeros };
+			std::vector<std::vector<uint8_t>> roundTrip = decrypt.cbc(encrypt.cbc(input, allZeros), allZeros);
+
+
+
+			Assert::AreEqual(input.size(), roundTrip.size());
+			for (int i = 0; i < input.size(); ++i) {
+				auto& exp = input.at(i);
+				auto& act = roundTrip.at(i);
+				for (int j = 0; j < 16; ++j) {
+					Assert::AreEqual(exp.at(j), act.at(j));
+				}
+			}
+		}
 	};
 }
