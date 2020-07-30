@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 
-__declspec(dllexport) class AmateurEncrypt
+class AmateurEncrypt
 {
 public:
 	AmateurEncrypt(const std::vector<uint8_t>& key);
