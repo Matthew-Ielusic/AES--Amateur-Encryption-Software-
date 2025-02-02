@@ -24,29 +24,35 @@
           (-> bytes (nth 2) (bit-shift-left 8))
           (-> bytes (nth 3))))
 
-(defn Rcon-MSB [i]
+(defn Rcon-MSB
   "The round 'constant' differs across the key schedule.
-   The nth round constant is (2 ** (n - 1)) << 24
+   The nth rcon is (2 ** (n - 1)) << 24
    (But remember we are exponentiating using weird XOR-based multiplication!)"
-  (cond (< i 0)  (throw (IllegalArgumentException. (str "i must be 0-indexed, was " i)))
-        (<= i 8) (bit-shift-left 1 (dec i))
-        (= i 9)  0x1b ;; 0x02 ** 8 = 0x80 * 0x02 = 0x1b under AES multiplication
-        (= i 10) 0x36
-        :else    (throw (IllegalArgumentException. (str "i must be at most 10, was " i)))))
+  [i]
+  (let [index (int (/ i Nk))]
+    (cond (< index 0) (throw (IllegalArgumentException. (str "i must be 0-indexed, was " i)))
+          (<= index 8) (bit-shift-left 1 (dec index))
+          (= index 9) 0x1b                                       ;; 0x02 ** 8 = 0x80 * 0x02 = 0x1b under AES multiplication
+          (= index 10) 0x36
+          :else (throw (IllegalArgumentException. (str "i must be at most 40, was " i))))))
 
-(defn add-Rcon [bytes i]
+(defn add-Rcon
   "xors the round constant with the input"
-  (update bytes 0 #(bit-xor % (Rcon-MSB (/ i Nk)))))
+  [i bytes]
+  (update bytes 0 #(bit-xor % (Rcon-MSB i))))
 
-(defn rotate [values n]
+(defn rotate [n values]
   (into (subvec values n) (subvec values 0 n)))
 
-(defn transform-word [word i]
-  ;; result = SubWord(RotWord(temp)) xor Rcon[i / Nk]
-  (-> word
+(defn transform-word
+  "Takes a 32-bit word and the round number i, and applies the transformation
+   `result = SubWord(RotWord(temp)) xor Rcon[i / Nk]`"
+  [word i]
+  {:pre [(int? word) (<= 4 i 43)]}
+  (->> word
       word->bytes
       (rotate 1)
-      (map core/sbox)
+      (mapv core/sbox)
       (add-Rcon i)
       bytes->word))
 
