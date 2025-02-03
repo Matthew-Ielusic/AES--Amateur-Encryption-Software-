@@ -56,3 +56,21 @@
       (add-Rcon i)
       bytes->word))
 
+(defn next-word
+  "Take a partial key schedule, and the current index of iteration, and returns what the next word in the key schedule will be."
+  [key-schedule i]
+  (let [temp       (last key-schedule) ; "temp" being the variable name in the specification pseudocode
+        temp'      (if (= 0 (mod i Nk))
+                     (transform-word temp i)
+                     temp)
+        xor-target (nth key-schedule (- i Nk))]
+    (bit-xor xor-target temp')))
+
+(defn KeyExpansion
+  "Takes a sequence of sixteen bytes, representing the 128-bit key, and returns a vector of forty-four 32-bit words.
+   The capitalization follows the capitalization used in the specification document."
+  [key]
+  {:pre [(sequential? key) (= 16 (count key))]}
+  (let [initial (mapv bytes->word (partition 4 key))]
+    (reduce #(conj %1 (next-word %1 %2)) initial (range 4 44))))
+

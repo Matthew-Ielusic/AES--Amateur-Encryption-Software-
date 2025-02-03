@@ -22,4 +22,29 @@
 
 
 (t/deftest transform-word
-  (= 0xd4d1c6f8 (sut/transform-word 0x11f915bc 24)))
+  ; Test case comes from row "i=24" of Appendix A.1
+  (t/is (= 0xb9596582 (sut/transform-word 0x11f915bc 24))))
+
+(t/deftest next-word
+  ; Test cases come from rows "i=4" and "i=5" of Appendix A.1
+  (let [start [0x2b7e1516 0x28aed2a6 0xabf7a588 0x09cf4f3c]
+        next  (conj start 0xa0fafe17)]
+    (t/is (= 0xa0fafe17 (sut/next-word start 4)))
+    (t/is (= 0x88542cb1 (sut/next-word next 5)))))
+
+(t/deftest KeyExpansion
+  (t/testing "Simple Cases"
+    (let [simple-key (range 16)
+          schedule   (sut/KeyExpansion simple-key)]
+      (t/is (= 0x00010203 (first schedule)))
+      (t/is (= 0x04050607 (second schedule)))
+      (t/is (= 0x08090a0b (nth schedule 2)))
+      (t/is (= 0x0c0d0e0f (nth schedule 3)))))
+  (t/testing "Appendex A.1"
+    ; Only test three selected indices, for brevity
+    (let [key      [0x2b 0x7e 0x15 0x16 0x28 0xae 0xd2 0xa6 0xab 0xf7 0x15 0x88 0x09 0xcf 0x4f 0x3c]
+          _ (tap> key)
+          schedule (sut/KeyExpansion key)]
+      (t/is (= 0x2b7e1516 (nth schedule 0)))
+      (t/is (= 0xdb0bad00 (nth schedule 19)))
+      (t/is (= 0xc9ee2589 (nth schedule 41))))))
