@@ -41,9 +41,6 @@
   [i bytes]
   (update bytes 0 #(bit-xor % (Rcon-MSB i))))
 
-(defn rotate [n values]
-  (into (subvec values n) (subvec values 0 n)))
-
 (defn transform-word
   "Takes a 32-bit word and the round number i, and applies the transformation
    `result = SubWord(RotWord(temp)) xor Rcon[i / Nk]`"
@@ -51,7 +48,7 @@
   {:pre [(int? word) (<= 4 i 43)]}
   (->> word
       word->bytes
-      (rotate 1)
+      (core/rotate 1)
       (mapv core/sbox)
       (add-Rcon i)
       bytes->word))
