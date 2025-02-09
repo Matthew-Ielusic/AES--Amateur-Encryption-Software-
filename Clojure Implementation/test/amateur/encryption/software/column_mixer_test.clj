@@ -22,3 +22,9 @@
         ; m(x) = x^8 + x^4 + x^3 + x + 1
         ; 0x99 * 0x03 -> x^7 + x^5 + x^4 -> 0xb0
         )
+
+(t/deftest times09
+  ; Expected values come from this Galois calculator: http://www.ee.unb.ca/cgi-bin/tervo/calc2.pl
+  (t/is (= 9 (sut/times09 0x01)))
+  (t/is (= 0x5a (sut/times09 0xa)))
+  (t/is (= 0x1c (sut/times09 0xf5))))
