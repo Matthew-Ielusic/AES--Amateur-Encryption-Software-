@@ -9,5 +9,14 @@
 
 (defn inv-sbox [value] (nth inv-sbox-lookup value))
 
-(defn rotate [n values]
+(defn rotate-left [n values]
   (into (subvec values n) (subvec values 0 n)))
+
+(defn rotate-right [n values]
+  (let [m (- (count values) n)]
+    (into (subvec values m) (subvec values 0 m))))
+
+(defn rotate [n values]
+  (if (>= n 0)
+    (rotate-left n values)
+    (rotate-right (* -1 n) values)))

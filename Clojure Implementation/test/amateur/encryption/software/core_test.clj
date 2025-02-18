@@ -7,4 +7,5 @@
   (t/is (= [1 2 3 0] (sut/rotate 1 [0 1 2 3])))
   (t/is (= [2 3 0 1] (sut/rotate 2 [0 1 2 3])))
   (t/is (= [3 0 1 2] (sut/rotate 3 [0 1 2 3])))
-  (t/is (= [4 0 1 2 3] (sut/rotate 4 [0 1 2 3 4]))))
+  (t/is (= [4 0 1 2 3] (sut/rotate 4 [0 1 2 3 4])))
+  (t/is (= [3 0 1 2] (sut/rotate -1 [0 1 2 3]))))
