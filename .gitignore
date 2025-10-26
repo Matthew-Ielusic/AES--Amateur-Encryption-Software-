@@ -149,3 +149,5 @@ x64/
 .hgignore
 .hg/
 
+# Intellij
+*.idea/
