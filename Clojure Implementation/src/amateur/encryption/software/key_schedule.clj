@@ -6,7 +6,7 @@
 (def Nr 10) ;; The number of rounds in encryption and decryption.  Is 10 for 128-bit AES.
 
 (defn word->bytes [word]
-  "The AES Specification is in terms of 4-byte words, but many operations acton
+  "The AES Specification is in terms of 4-byte words, but many operations act on
    single bytes.  Hence functions to go from one to the other.
    My convention is that the leading byte is the most significant."
   [(-> word (bit-and 0xff000000) (bit-shift-right 24))
@@ -71,3 +71,17 @@
   (let [initial (mapv bytes->word (partition 4 key))]
     (reduce #(conj %1 (next-word %1 %2)) initial (range 4 44))))
 
+(defn add-round-key [state key-schedule round-num]
+  "Takes the state, as an array-of-array-of-bytes, the expanded key, and the current round number, and returns the result of adding the round key to the state."
+  (let [xform (comp (drop (* round-num 4))                  ; Start at, in the words of the specification, round * Nb
+                    (take 4)                                ; Take 4 words from the key schedule
+                    (map word->bytes))
+        bytes (into [] xform key-schedule)]
+    ; So we have two vectors-of-vectors-of-bytes... state & "bytes"
+    ; We just want to XOR them together.
+    (tap> "bytes:")
+    (tap> bytes)
+    (mapv
+      (partial mapv bit-xor)
+      state
+      bytes)))
