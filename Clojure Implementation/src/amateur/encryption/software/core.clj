@@ -17,6 +17,6 @@
     (into (subvec values m) (subvec values 0 m))))
 
 (defn rotate [n values]
-  (if (>= n 0)
-    (rotate-left n values)
-    (rotate-right (* -1 n) values)))
+  (if (neg? n)
+    (rotate-right (- n) values)
+    (rotate-left n values)))

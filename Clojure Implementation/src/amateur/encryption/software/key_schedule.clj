@@ -5,19 +5,21 @@
 (def Nk 4)  ;; The number of 32-bit words in the key.  Because I am only implementing 128-bit encryption, Nk = 4.
 (def Nr 10) ;; The number of rounds in encryption and decryption.  Is 10 for 128-bit AES.
 
-(defn word->bytes [word]
+(defn word->bytes
   "The AES Specification is in terms of 4-byte words, but many operations act on
    single bytes.  Hence functions to go from one to the other.
    My convention is that the leading byte is the most significant."
+  [word]
   [(-> word (bit-and 0xff000000) (bit-shift-right 24))
    (-> word (bit-and 0x00ff0000) (bit-shift-right 16))
    (-> word (bit-and 0x0000ff00) (bit-shift-right 8))
    (-> word (bit-and 0x000000ff))])
 
-(defn bytes->word [bytes]
+(defn bytes->word
   "The AES Specification is in terms of 4-byte words, but many operations act on
    single bytes.  Hence functions to go from one to the other.
-  My convention is that the leading byte is the most significant."
+   My convention is that the leading byte is the most significant."
+  [bytes]
   (assert (= (count bytes) 4))
   (bit-or (-> bytes (nth 0) (bit-shift-left 24))
           (-> bytes (nth 1) (bit-shift-left 16))
@@ -71,8 +73,9 @@
   (let [initial (mapv bytes->word (partition 4 key))]
     (reduce #(conj %1 (next-word %1 %2)) initial (range 4 44))))
 
-(defn add-round-key [state key-schedule round-num]
+(defn add-round-key
   "Takes the state, as an array-of-array-of-bytes, the expanded key, and the current round number, and returns the result of adding the round key to the state."
+  [state key-schedule round-num]
   (let [xform (comp (drop (* round-num 4))                  ; Start at, in the words of the specification, round * Nb
                     (take 4)                                ; Take 4 words from the key schedule
                     (map word->bytes))
