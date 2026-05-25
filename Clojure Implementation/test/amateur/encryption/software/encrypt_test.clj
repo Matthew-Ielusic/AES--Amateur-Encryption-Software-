@@ -6,7 +6,7 @@
 (t/deftest shift-rows
   (let [state [ [0 1 2 3] [4 5 6 7] [8 9 10 11] [12 13 14 15] ]
         expected [ [0 1 2 3] [5 6 7 4] [10 11 8 9] [15 12 13 14] ]]
-    (t/is (= expected (sut/shift-rows state)))))
+    (t/is (= expected (sut/ShiftRows state)))))
 
 (t/deftest mix-column
   (t/are
@@ -19,7 +19,7 @@
     [0xb8 0x41 0x11 0xf1] [0x48 0xf8 0xd3 0x7a]
     [0x1e 0x27 0x98 0xe5] [0x28 0x06 0x26 0x4c]))
 
-(t/deftest mix-columns
+(t/deftest MixColumns
   ; Test data is from Appendix B, Row 2
   (let [input    [ [0x49 0x45 0x7f 0x77]
                    [0xdb 0x39 0x02 0xde]
@@ -30,6 +30,6 @@
                    [0xca 0x5a 0xca 0xb0]
                    [0xf1 0xac 0xa8 0xe5]] ]
     (t/is
-     (=
-       expected
-       (sut/mix-columns input)))))
+      (=
+        expected
+        (sut/MixColumns input)))))

@@ -4,7 +4,7 @@
     [amateur.encryption.software.column-mixer :as column-mixer]
     [amateur.encryption.software.key-schedule :as key-schedule]))
 
-(defn shift-rows
+(defn ShiftRows
   "Takes an array-of-arrays-of-bytes, and executes the ShiftRows operation on it.
    Each nested array represents a row."
   [state]
@@ -28,7 +28,7 @@
         transposed  ((apply juxt juxt-target) state)]
     transposed))
 
-(defn mix-columns
+(defn MixColumns
   "Takes an array-of-arrays-of-bytes, and executes the MixColumns operation on it.
    Each nested array represents a row."
   [state]

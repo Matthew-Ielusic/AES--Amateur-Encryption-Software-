@@ -73,7 +73,7 @@
   (let [initial (mapv bytes->word (partition 4 key))]
     (reduce #(conj %1 (next-word %1 %2)) initial (range 4 44))))
 
-(defn add-round-key
+(defn AddRoundKey
   "Takes the state, as an array-of-array-of-bytes, the expanded key, and the current round number, and returns the result of adding the round key to the state."
   [state key-schedule round-num]
   (let [xform (comp (drop (* round-num 4))                  ; Start at, in the words of the specification, round * Nb
