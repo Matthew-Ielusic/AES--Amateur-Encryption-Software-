@@ -39,10 +39,6 @@
   ; Clojure translation of the above:
   (loop [result (-> byte (bit-shift-left 3) (bit-xor byte))
          shift 3]
-    (prn "result:")
-    (prn result)
-    (prn "shift:")
-    (prn shift)
     (let [result' (if (not=
                         0
                         (bit-and

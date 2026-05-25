@@ -79,11 +79,11 @@
   (let [xform (comp (drop (* round-num 4))                  ; Start at, in the words of the specification, round * Nb
                     (take 4)                                ; Take 4 words from the key schedule
                     (map word->bytes))
-        bytes (into [] xform key-schedule)]
+        bytes' (into [] xform key-schedule)
+        bytes  (apply mapv vector bytes')                     ; Transpose the key schedule to match the row-major convention for the state
+        ]
     ; So we have two vectors-of-vectors-of-bytes... state & "bytes"
     ; We just want to XOR them together.
-    (tap> "bytes:")
-    (tap> bytes)
     (mapv
       (partial mapv bit-xor)
       state
