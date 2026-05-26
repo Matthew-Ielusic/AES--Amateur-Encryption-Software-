@@ -10,6 +10,11 @@
   [state]
   (into [] (map-indexed #(core/rotate %1 %2)) state))
 
+(defn SubBytes
+  "Takes an array-of-array-of-bytes, and executes the SubBytes operation on it."
+  [state]
+  (mapv (partial mapv core/sbox) state))
+
 (defn mix-column
   "Applies the MixColumns transformation to single column."
   [column]
@@ -36,4 +41,3 @@
        (transpose)
        (mapv mix-column)
        (transpose)))
-
